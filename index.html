@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Healthcare AI Full-Stack Structure</title>
+  <style>
+    :root {
+      --bg: #f5fafc;
+      --surface: #ffffff;
+      --surface-soft: #f8fcfd;
+      --ink: #102a43;
+      --muted: #5f7482;
+      --line: #d9e7ed;
+      --navy: #123047;
+      --green: #0f8f7d;
+      --cyan: #138aa1;
+      --blue: #2563eb;
+      --slate: #2f7c8f;
+      --purple: #7461c9;
+      --orange: #d97635;
+      --rose: #d94f73;
+      --shadow: 0 18px 42px rgba(16, 42, 67, 0.12);
+      --soft-shadow: 0 10px 24px rgba(16, 42, 67, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 7% 0%, rgba(15, 143, 125, 0.15), transparent 28rem),
+        radial-gradient(circle at 98% 10%, rgba(37, 99, 235, 0.1), transparent 30rem),
+        linear-gradient(180deg, #eef8fb 0%, var(--bg) 44%, #f9fcfd 100%);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.62;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1260px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 38px 0 60px;
+    }
+
+    .shell {
+      overflow: hidden;
+      border: 1px solid rgba(217, 231, 237, 0.95);
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: var(--shadow);
+    }
+
+    header {
+      position: relative;
+      padding: clamp(30px, 5vw, 58px) clamp(24px, 5vw, 54px) 26px;
+      text-align: center;
+    }
+
+    .language-toggle {
+      position: absolute;
+      top: 20px;
+      right: 22px;
+      display: inline-flex;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .language-toggle button {
+      min-width: 48px;
+      padding: 8px 12px;
+      border: 0;
+      background: transparent;
+      color: #426579;
+      cursor: pointer;
+      font-weight: 900;
+      transition: background 160ms ease, color 160ms ease;
+    }
+
+    .language-toggle button.active {
+      background: var(--navy);
+      color: #ffffff;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 12px;
+      font-size: clamp(2.25rem, 5vw, 4.7rem);
+      line-height: 1.03;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 6px;
+      font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 1.13rem;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-bottom: 0;
+      color: #49677a;
+      font-size: clamp(1.03rem, 2vw, 1.45rem);
+      font-weight: 800;
+    }
+
+    .section {
+      padding: 24px clamp(18px, 4vw, 46px);
+    }
+
+    .demo-bar {
+      display: grid;
+      grid-template-columns: minmax(120px, 0.8fr) minmax(360px, 2.6fr) minmax(160px, 0.9fr);
+      gap: 18px;
+      align-items: center;
+      padding: 18px 22px;
+      border-radius: 20px;
+      background: var(--navy);
+      color: #ffffff;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .demo-bar strong {
+      font-size: 1.05rem;
+    }
+
+    .demo-bar.demo-only {
+      display: block;
+      text-align: center;
+    }
+
+    .demo-bar.demo-only strong {
+      display: block;
+      font-size: 1.25rem;
+    }
+
+    .demo-sequence {
+      text-align: center;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .demo-view {
+      color: #c6f6d5;
+      font-size: 0.93rem;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .flow-scroll {
+      overflow-x: auto;
+      margin-top: 28px;
+      padding: 4px 4px 18px;
+    }
+
+    .flow-row {
+      min-width: 1120px;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(132px, 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .supporting-layers-band {
+      min-width: 1120px;
+      display: grid;
+      place-items: center;
+      min-height: 62px;
+      margin-top: 12px;
+      border: 5px solid #111827;
+      border-top-width: 0;
+      border-radius: 0 0 50% 50% / 0 0 80% 80%;
+      color: #f3d400;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .flow-card {
+      position: relative;
+      min-height: 130px;
+      display: grid;
+      place-items: center;
+      padding: 16px 12px;
+      border-radius: 22px;
+      background: var(--accent);
+      color: #ffffff;
+      text-align: center;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .flow-card:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -25px;
+      top: 50%;
+      z-index: 2;
+      color: #92a5b0;
+      font-size: 2rem;
+      font-weight: 900;
+      transform: translateY(-50%);
+    }
+
+    .flow-icon {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 2rem;
+    }
+
+    .flow-title {
+      display: block;
+      font-size: 1.08rem;
+      font-weight: 900;
+      line-height: 1.18;
+    }
+
+    .flow-subtitle {
+      display: block;
+      margin-top: 7px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .section-heading {
+      margin: 18px 0 22px;
+      text-align: center;
+    }
+
+    .section-heading p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 18px 0 22px;
+    }
+
+    .button {
+      min-height: 42px;
+      padding: 10px 15px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .button:hover {
+      background: #0b2235;
+      box-shadow: 0 10px 22px rgba(16, 42, 67, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .button.secondary {
+      background: #e7f1f5;
+      color: #2a4d60;
+    }
+
+    .button.secondary:hover {
+      background: #d8e8ee;
+    }
+
+    .button.active {
+      background: var(--navy);
+      color: #ffffff;
+      box-shadow: 0 10px 22px rgba(16, 42, 67, 0.18);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+      border: 2px solid color-mix(in srgb, var(--accent) 30%, #ffffff);
+      border-radius: 22px;
+      background: #ffffff;
+      box-shadow: var(--soft-shadow);
+      cursor: pointer;
+      text-align: left;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .summary-card:hover,
+    .summary-card.active {
+      border-color: var(--accent);
+      box-shadow: var(--shadow);
+      transform: translateY(-3px);
+    }
+
+    .summary-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stage-number {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 18%, #ffffff);
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .summary-icon {
+      font-size: 1.7rem;
+    }
+
+    .summary-card h3 {
+      font-size: 1.13rem;
+    }
+
+    .summary-card p {
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 750;
+    }
+
+    .preview-list {
+      margin: 0 0 16px;
+      padding-left: 18px;
+      color: #315569;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .preview-list li {
+      margin: 4px 0;
+    }
+
+    .card-action {
+      margin-top: auto;
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .panel-wrap {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 260ms ease;
+    }
+
+    .panel-wrap.open {
+      grid-template-rows: 1fr;
+    }
+
+    .panel-inner {
+      overflow: hidden;
+    }
+
+    .detail-panel {
+      margin-top: 24px;
+      padding: clamp(18px, 3vw, 28px);
+      border: 1px solid var(--line);
+      border-left: 8px solid var(--panel-accent, var(--green));
+      border-radius: 24px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .detail-kicker {
+      margin-bottom: 5px;
+      color: var(--panel-accent, var(--green));
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .close-button {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      background: #eef5f8;
+      color: #29495a;
+      cursor: pointer;
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+
+    .detail-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 18px;
+    }
+
+    .detail-tab {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #ffffff;
+      color: #315569;
+      cursor: pointer;
+      font-weight: 850;
+    }
+
+    .detail-tab.active {
+      border-color: var(--panel-accent, var(--green));
+      background: color-mix(in srgb, var(--panel-accent, var(--green)) 12%, #ffffff);
+      color: var(--panel-accent, var(--green));
+    }
+
+    .detail-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .info-card,
+    .hierarchy-box,
+    .support-output,
+    .footer-summary {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface-soft);
+      padding: 18px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .text-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #315569;
+      font-weight: 700;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      padding: 8px 10px;
+      border: 1px solid #cbdfe7;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #2d5264;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 850;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .chip:hover,
+    .chip.active {
+      border-color: var(--panel-accent, var(--green));
+      background: color-mix(in srgb, var(--panel-accent, var(--green)) 12%, #ffffff);
+      color: var(--panel-accent, var(--green));
+      transform: translateY(-1px);
+    }
+
+    .hierarchy-output {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #ffffff;
+      color: #315569;
+      font-weight: 700;
+      transition: opacity 160ms ease;
+    }
+
+    .hierarchy-helper {
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .hierarchy-card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .hierarchy-card-button {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbdfe7;
+      border-radius: 16px;
+      background: #ffffff;
+      color: #264b5d;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 6px 16px rgba(16, 42, 67, 0.06);
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .hierarchy-card-button:hover,
+    .hierarchy-card-button.active {
+      border-color: var(--panel-accent, var(--green));
+      background: color-mix(in srgb, var(--panel-accent, var(--green)) 10%, #ffffff);
+      box-shadow: 0 10px 22px rgba(16, 42, 67, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .hierarchy-card-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--panel-accent, var(--green)) 14%, #ffffff);
+      font-size: 1.1rem;
+    }
+
+    .hierarchy-card-name {
+      display: block;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .hierarchy-card-subtitle {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.83rem;
+      font-weight: 750;
+      line-height: 1.3;
+    }
+
+    .selected-detail {
+      display: grid;
+      gap: 12px;
+    }
+
+    .selected-detail-title {
+      margin-bottom: 2px;
+      color: var(--panel-accent, var(--green));
+      font-size: 1.35rem;
+      font-weight: 900;
+    }
+
+    .detail-row {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-soft);
+    }
+
+    .detail-row-label {
+      display: block;
+      margin-bottom: 4px;
+      color: #426579;
+      font-size: 0.84rem;
+      font-weight: 900;
+    }
+
+    .detail-row-text {
+      color: #264b5d;
+      font-weight: 750;
+    }
+
+    .related-examples-box {
+      padding: 14px;
+      border: 1px solid color-mix(in srgb, var(--panel-accent, var(--green)) 22%, var(--line));
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-accent, var(--green)) 8%, #ffffff);
+    }
+
+    .related-examples-title {
+      display: block;
+      margin-bottom: 10px;
+      color: #29495a;
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .related-tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .related-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 6px 10px;
+      border: 1px solid color-mix(in srgb, var(--panel-accent, var(--green)) 22%, #d8e7ed);
+      border-radius: 999px;
+      background: #ffffff;
+      color: #315569;
+      font-size: 0.86rem;
+      font-weight: 850;
+    }
+
+    .support-panel {
+      margin-top: 22px;
+      padding: clamp(18px, 3vw, 28px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .support-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface-soft);
+    }
+
+    .support-output {
+      margin-top: 16px;
+      background: #ffffff;
+    }
+
+    .footer-summary,
+    .pm-view-card {
+      margin-top: 22px;
+      background: var(--navy);
+      color: #ffffff;
+    }
+
+    .footer-summary p,
+    .pm-view-card p {
+      margin-bottom: 0;
+      font-weight: 750;
+    }
+
+    .pm-view-card {
+      padding: clamp(18px, 3vw, 24px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 18px;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .pm-view-card h3 {
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .pm-subtitle {
+      margin-bottom: 18px;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .pm-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .pm-section {
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .pm-section strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #c6f6d5;
+      font-size: 0.9rem;
+    }
+
+    .pm-section ul {
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 750;
+    }
+
+    .pm-section.full {
+      grid-column: 1 / -1;
+    }
+
+    .is-hidden {
+      display: none;
+    }
+
+    @media (max-width: 1120px) {
+      .summary-grid,
+      .support-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .pm-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 840px) {
+      .demo-bar {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .demo-view {
+        text-align: center;
+      }
+
+      .demo-sequence {
+        white-space: normal;
+      }
+
+      .detail-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page {
+        width: min(100% - 18px, 1260px);
+        padding: 18px 0 42px;
+      }
+
+      .shell {
+        border-radius: 22px;
+      }
+
+      .language-toggle {
+        position: static;
+        margin: 0 auto 18px;
+      }
+
+      .summary-grid,
+      .support-grid,
+      .pm-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-card {
+        min-height: auto;
+      }
+
+      .hierarchy-card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="shell">
+      <header>
+        <div class="language-toggle" aria-label="Language selector">
+          <button type="button" id="langEn">EN</button>
+          <button type="button" id="langKo" class="active">KR</button>
+        </div>
+        <h1 id="mainTitle">Healthcare AI Full-Stack Structure</h1>
+        <p class="subtitle" id="mainSubtitle">Demo는 가로 흐름으로 단순하게, Production은 각 단계 아래에서 확장</p>
+      </header>
+
+      <section class="section" aria-labelledby="demo-title">
+        <h2 id="demo-title" class="is-hidden">Demo Flow</h2>
+        <div class="demo-bar demo-only">
+          <strong id="demoBarLabel">Demo Flow</strong>
+        </div>
+
+        <div class="flow-scroll">
+          <div class="flow-row" id="flowRow"></div>
+          <div class="supporting-layers-band" id="supportingBandLabel">supporting layers</div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="production-title">
+        <div class="section-heading">
+          <h2 id="production-title">Production Expansion</h2>
+          <p id="productionSubtitle">각 demo 단계가 실제 서비스에서는 어떤 책임과 운영 요소로 확장되는지 (예시, healthcare)</p>
+        </div>
+
+        <div class="toolbar">
+          <button type="button" class="button" id="expandAll">전체 펼치기</button>
+          <button type="button" class="button secondary" id="collapseAll">전체 접기</button>
+          <button type="button" class="button secondary" id="summaryToggle">최종 요약</button>
+          <button type="button" class="button secondary" id="pmToggle">Project Management View</button>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid"></div>
+
+        <div class="panel-wrap" id="detailWrap">
+          <div class="panel-inner">
+            <article class="detail-panel" id="detailPanel" aria-live="polite"></article>
+          </div>
+        </div>
+
+        <div class="panel-wrap" id="supportWrap">
+          <div class="panel-inner">
+            <article class="support-panel" id="supportPanel"></article>
+          </div>
+        </div>
+
+        <div class="panel-wrap" id="summaryWrap">
+          <div class="panel-inner">
+            <div class="footer-summary">
+              <h3 id="finalSummaryTitle"></h3>
+              <p id="footerSummaryText"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-wrap" id="pmWrap">
+          <div class="panel-inner">
+            <article class="pm-view-card">
+              <h3 id="pmViewTitle"></h3>
+              <div id="pmViewContent"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const translations = {
+      ko: {
+        title: "Healthcare AI Full-Stack Structure",
+        subtitle: "Demo는 가로 흐름으로 단순하게, Production은 각 단계 아래에서 확장",
+        demoFlow: "Demo Flow",
+        supportingLayersBand: "supporting layers",
+        productionTitle: "Production Expansion",
+        productionSubtitle: "각 demo 단계가 실제 서비스에서는 어떤 책임과 운영 요소로 확장되는지 (예시, healthcare)",
+        expandAll: "전체 펼치기",
+        collapseAll: "전체 접기",
+        finalSummary: "최종 요약",
+        projectManagementView: "Project Management View",
+        clickForDetail: "자세히 보기",
+        stageLabel: "Stage",
+        closeDetail: "상세 패널 닫기",
+        tabs: {
+          overview: "개요",
+          questions: "핵심 질문",
+          hierarchy: "구성 요소"
+        },
+        componentsTitle: "구성 요소 선택",
+        componentsHelper: "항목을 클릭하면 오른쪽에 자세한 설명이 표시됩니다.",
+        detailTitle: "상세 설명",
+        detailLabels: {
+          role: "역할",
+          dataAccess: "접근 데이터 / 처리 데이터",
+          mainFunctions: "주요 기능",
+          healthcareExample: "AI 헬스케어 예시",
+          keyPoint: "핵심 포인트",
+          relatedExamples: "관련 기술 / 서비스 예시"
+        },
+        finalSummaryTitle: "최종 요약",
+        pmViewTitle: "Project Management View",
+        footerSummary: "AI 헬스케어 서비스는 모델만으로 완성되지 않습니다.<br><br>User, Client Device, Frontend, Network, Backend, AI Model, Result, Supporting Layers가 함께 연결되어야 실제 서비스가 됩니다.<br><br>Demo는 이해를 돕는 단순 흐름이고, Production은 권한, 보안, 데이터, 운영 안정성, 임상 안전성까지 포함하는 실제 서비스 구조입니다.",
+        pmViewHtml: `
+          <p class="pm-subtitle">AI PM / Healthcare PM / SaaS TPM 관점에서 확인해야 할 것</p>
+          <div class="pm-grid">
+            <div class="pm-section"><strong>👥 Stakeholders</strong><ul><li>Patient</li><li>Doctor</li><li>Nurse</li><li>Researcher</li><li>Admin</li><li>Frontend Engineer</li><li>Backend Engineer</li><li>AI / ML Engineer</li><li>Security Team</li><li>Clinical Reviewer</li></ul></div>
+            <div class="pm-section"><strong>⚠️ Key Risks</strong><ul><li>의료 데이터 개인정보 유출</li><li>권한 없는 사용자 접근</li><li>AI 결과 오해</li><li>모델 성능 저하</li><li>서버 장애</li><li>응답 지연</li><li>감사 로그 부족</li></ul></div>
+            <div class="pm-section"><strong>🔗 Dependencies</strong><ul><li>Frontend와 Backend API 연결</li><li>Backend와 Database 연결</li><li>Backend와 AI Model 연결</li><li>Auth / Permissions 설정</li><li>Cloud deployment 준비</li><li>Monitoring / Logs 설정</li><li>Clinical review process 정의</li></ul></div>
+            <div class="pm-section"><strong>📊 Success Metrics</strong><ul><li>API 응답 시간</li><li>모델 응답 시간</li><li>오류율</li><li>사용자 완료율</li><li>권한 오류 감소</li><li>시스템 가동률</li><li>감사 로그 추적 가능성</li></ul></div>
+            <div class="pm-section full"><strong>📌 PM Value</strong><p>이 구조는 AI PM 또는 Technical Project Manager가 단순히 모델 성능만 보는 것이 아니라, 실제 서비스 운영에 필요한 사용자, 데이터, 보안, API, 모니터링, 임상 안전성까지 함께 관리해야 함을 보여줍니다.</p></div>
+          </div>
+        `
+      },
+      en: {
+        title: "Healthcare AI Full-Stack Structure",
+        subtitle: "Demo flow stays simple, while production expands each stage into real service responsibilities.",
+        demoFlow: "Demo Flow",
+        supportingLayersBand: "supporting layers",
+        productionTitle: "Production Expansion",
+        productionSubtitle: "How each demo stage expands into real production responsibilities and operations",
+        expandAll: "Expand All",
+        collapseAll: "Collapse All",
+        finalSummary: "Final Summary",
+        projectManagementView: "Project Management View",
+        clickForDetail: "Click for detail",
+        stageLabel: "Stage",
+        closeDetail: "Close detail panel",
+        tabs: {
+          overview: "Overview",
+          questions: "Key Questions",
+          hierarchy: "Components"
+        },
+        componentsTitle: "Select Component",
+        componentsHelper: "Click an item to show its details on the right.",
+        detailTitle: "Detail",
+        detailLabels: {
+          role: "Role",
+          dataAccess: "Data Access / Handled Data",
+          mainFunctions: "Main Functions",
+          healthcareExample: "Healthcare AI Example",
+          keyPoint: "Key Point",
+          relatedExamples: "Related Technologies / Service Examples"
+        },
+        finalSummaryTitle: "Final Summary",
+        pmViewTitle: "Project Management View",
+        footerSummary: "An AI healthcare service is not completed by the AI model alone.<br><br>User, Client Device, Frontend, Network, Backend, AI Model, Result, and Supporting Layers must work together to become a real service.<br><br>The demo flow is simplified for understanding, while production includes permissions, security, data handling, operational stability, and clinical safety.",
+        pmViewHtml: `
+          <p class="pm-subtitle">What an AI PM, Healthcare PM, or SaaS TPM should check</p>
+          <div class="pm-grid">
+            <div class="pm-section"><strong>👥 Stakeholders</strong><ul><li>Patient</li><li>Doctor</li><li>Nurse</li><li>Researcher</li><li>Admin</li><li>Frontend Engineer</li><li>Backend Engineer</li><li>AI / ML Engineer</li><li>Security Team</li><li>Clinical Reviewer</li></ul></div>
+            <div class="pm-section"><strong>⚠️ Key Risks</strong><ul><li>Healthcare data privacy risk</li><li>Unauthorized access</li><li>Misinterpretation of AI results</li><li>Model performance degradation</li><li>Server failure</li><li>Slow response time</li><li>Missing audit logs</li></ul></div>
+            <div class="pm-section"><strong>🔗 Dependencies</strong><ul><li>Frontend and backend API connection</li><li>Backend and database connection</li><li>Backend and AI model connection</li><li>Auth and permissions setup</li><li>Cloud deployment readiness</li><li>Monitoring and logs setup</li><li>Clinical review process definition</li></ul></div>
+            <div class="pm-section"><strong>📊 Success Metrics</strong><ul><li>API response time</li><li>Model latency</li><li>Error rate</li><li>User completion rate</li><li>Reduced permission errors</li><li>System availability</li><li>Audit log traceability</li></ul></div>
+            <div class="pm-section full"><strong>📌 PM Value</strong><p>This structure shows that an AI PM or Technical Project Manager should not only focus on model performance, but also manage users, data, security, APIs, monitoring, and clinical safety for real production services.</p></div>
+          </div>
+        `
+      }
+    };
+
+    let currentLanguage = "ko";
+    let activeTabId = "overview";
+    const selectedItemByStage = {};
+
+    const stages = [
+      {
+        id: "user",
+        number: 1,
+        icon: "👤",
+        title: "User",
+        flowSubtitle: "서비스 사용자",
+        subtitle: "역할과 접근 권한",
+        accent: "#0f8f7d",
+        preview: ["Patient", "Doctor", "Nurse", "Researcher", "Admin"],
+        description: "AI 헬스케어 서비스에서는 모든 사용자가 같은 권한을 가지면 안 됩니다. 환자, 의사, 간호사, 연구자, 관리자는 각각 다른 역할과 책임을 가지므로 접근 가능한 데이터와 기능이 달라집니다.",
+        questions: ["이 사용자는 누구인가?", "어떤 데이터를 볼 수 있는가?", "어떤 기능을 사용할 수 있는가?", "의료 데이터 접근 권한이 어디까지인가?"],
+        concepts: ["Role-Based Access Control (RBAC)", "Permission Management", "User Management", "Identity Management"],
+        hierarchy: ["Patient", "Doctor", "Nurse", "Researcher", "Admin"]
+      },
+      {
+        id: "device",
+        number: 2,
+        icon: "📱",
+        title: "Client Device",
+        flowSubtitle: "접속 기기",
+        subtitle: "사용자가 어떤 기기로 접속하는지",
+        accent: "#138aa1",
+        preview: ["Smartphone", "Laptop", "Tablet", "Desktop", "Hospital Workstation"],
+        description: "Client Device는 사용자가 서비스를 실제로 접속하는 기기입니다. 스마트폰, 노트북, 태블릿, 병원 업무용 PC 등 다양한 환경을 고려해야 합니다.",
+        questions: ["사용자가 어떤 기기로 접속하는가?", "모바일에서도 잘 보이는가?", "병원 PC에서도 잘 작동하는가?", "화면 크기에 따라 디자인이 바뀌는가?", "민감한 의료 데이터가 기기에 남지 않는가?"],
+        concepts: ["Responsive Design", "Browser Compatibility", "Mobile App", "Web App", "Device Security"],
+        hierarchy: ["Smartphone", "Laptop", "Tablet", "Desktop", "Hospital Workstation"]
+      },
+      {
+        id: "frontend",
+        number: 3,
+        icon: "🖥️",
+        title: "Frontend",
+        flowSubtitle: "입력과 화면",
+        subtitle: "사용자가 보는 화면과 상호작용",
+        accent: "#2563eb",
+        preview: ["HTML / CSS / JavaScript", "Web / App Screen", "User Input", "Validation", "Result Display"],
+        description: "Frontend는 사용자가 가장 먼저 경험하는 서비스의 화면과 상호작용 영역입니다. 입력, 화면 표시, 오류 처리, 결과 전달을 담당합니다.",
+        questions: ["사용자가 데이터를 쉽게 입력할 수 있는가?", "오류 메시지가 이해하기 쉬운가?", "AI 결과가 너무 어렵게 보이지 않는가?", "의료적으로 오해할 수 있는 표현은 없는가?"],
+        concepts: ["React", "Vue", "Angular", "Vercel", "Netlify", "AWS Amplify", "Figma", "Tailwind CSS", "Material UI"],
+        hierarchy: ["HTML", "CSS", "JavaScript", "Web / App Screen", "User Input", "Client-side Validation", "State Management", "Error Message Handling", "Result Display"]
+      },
+      {
+        id: "network",
+        number: 4,
+        icon: "🌐",
+        title: "Network / Web Basics",
+        flowSubtitle: "웹 통신 구조",
+        subtitle: "사용자의 요청이 서버까지 이동하는 웹 통신 구조",
+        accent: "#2f7c8f",
+        preview: ["Domain", "DNS", "IP Address", "REST API / JSON", "HTTP / HTTPS"],
+        description: "사용자가 입력한 주소가 실제 서버까지 연결되고, 요청과 응답이 안전하게 오가는 과정을 설명하는 영역입니다. 예시 흐름: User enters domain → DNS finds server IP → Browser connects through HTTPS → Request goes to backend server → Backend returns response.",
+        questions: ["사용자가 입력한 주소가 어떻게 서버까지 가는가?", "요청과 응답은 어떤 방식으로 오가는가?", "의료 데이터는 안전하게 전송되는가?"],
+        concepts: ["Cloudflare", "AWS Route 53", "Google Cloud DNS", "SSL/TLS Certificate", "Domain", "DNS", "HTTPS"],
+        hierarchy: ["Domain", "DNS", "IP Address", "TCP/IP", "Port", "HTTP", "HTTPS", "REST API / JSON Flow"]
+      },
+      {
+        id: "backend",
+        number: 5,
+        icon: "🧩",
+        title: "Backend",
+        flowSubtitle: "요청 처리 서버",
+        subtitle: "보안, 권한, 데이터, API, 운영",
+        accent: "#7461c9",
+        preview: ["API Gateway", "REST API", "Consent & Privacy", "Error / Fallback", "Monitoring"],
+        description: "Backend는 서비스의 중심 처리 영역입니다. 사용자의 요청을 받고, 권한을 확인하고, 데이터를 검증하고, 데이터베이스와 AI 모델을 연결하고, 결과를 반환합니다.",
+        questions: ["사용자의 요청을 어디서 받는가?", "데이터를 검증하는가?", "AI 모델을 어떻게 호출하는가?", "권한이 없는 사용자를 막는가?", "장애가 나면 복구할 수 있는가?"],
+        concepts: ["FastAPI", "Flask", "Django", "Node.js / Express", "Postman", "Swagger / OpenAPI", "PostgreSQL", "MySQL", "MongoDB", "AWS S3", "Google Cloud Storage", "Azure Blob Storage", "AWS EC2", "AWS Lambda", "Google Cloud Run", "Azure App Service"],
+        hierarchy: ["API Gateway", "Backend API", "REST API / JSON Flow", "Business Logic", "Data Validation", "Auth & Permissions", "Consent & Data Privacy", "Database & Storage", "Security & Data Access", "Rate Limiting", "Caching", "Load Balancing & Scaling", "Observability & Logs", "Availability & Recovery", "Error / Fallback Flow"]
+      },
+      {
+        id: "model",
+        number: 6,
+        icon: "🧠",
+        title: "AI Model",
+        flowSubtitle: "분석과 예측",
+        subtitle: "모델 실행과 거버넌스",
+        accent: "#d97635",
+        preview: ["Input Processing", "Model Serving", "Prediction / Inference", "Human-in-the-loop", "Model Version Tracking", "Model Governance"],
+        description: "AI Model은 입력 데이터를 분석해 예측, 분류, 요약, 위험도 결과를 생성하는 영역입니다. 정확도뿐 아니라 설명 가능성, bias check, clinical review, version control까지 중요합니다.",
+        questions: ["모델 입력 형식은 무엇인가?", "텍스트, 이미지, 수치 데이터를 어떻게 전처리하는가?", "모델은 어디서 실행되는가?", "GPU가 필요한가?", "모델 결과를 추적할 수 있는가?", "모델 버전이 관리되는가?"],
+        concepts: ["AWS SageMaker", "Google Vertex AI", "Azure Machine Learning", "Hugging Face", "Docker", "Kubernetes", "MLflow", "Evidently AI", "Prometheus / Grafana"],
+        hierarchy: ["Model Input Processing", "Model Serving", "Cloud & Compute", "Prediction / Inference", "Model Monitoring", "Human-in-the-loop Review", "Model Version Tracking", "Model Governance"]
+      },
+      {
+        id: "result",
+        number: 7,
+        icon: "📋",
+        title: "Result",
+        flowSubtitle: "결과 제공",
+        subtitle: "안전하게 보여주는 결과",
+        accent: "#d94f73",
+        preview: ["JSON Response", "Clinical Safety", "Error / Fallback", "Model Version Tracking", "Audit / Logs"],
+        description: "Result는 AI 결과를 사용자에게 안전하고 이해하기 쉽게 전달하는 영역입니다. 단순 출력이 아니라 저장, 설명, 추적, 안전 문구, 오류 처리까지 포함합니다. 예: AI 결과는 참고용이며 의료진의 판단을 대체하지 않습니다.",
+        questions: ["결과를 사용자가 이해할 수 있는가?", "AI 결과가 의학적 판단처럼 과하게 보이지 않는가?", "위험도, 확률, 설명이 함께 제공되는가?", "결과가 저장되고 추적되는가?", "어떤 모델 버전이 결과를 만들었는가?"],
+        concepts: ["Clinical Safety Message", "Audit / Logs", "Traceability", "Error Handling", "Result Storage"],
+        hierarchy: ["Backend Response", "REST API / JSON Flow", "Result Storage", "Frontend Display", "Human-in-the-loop Review", "Clinical Safety Message", "Error Handling", "Error / Fallback Flow", "Model Version Tracking", "Audit / Logs"]
+      },
+      {
+        id: "supporting",
+        number: 8,
+        icon: "🧱",
+        title: "Supporting Layers",
+        flowSubtitle: "운영 기반",
+        subtitle: "전체 서비스를 받쳐주는 공통 기반",
+        accent: "#f3d400",
+        preview: ["Consent & Data Privacy", "Monitoring & Operations", "Project Management View", "Security & Compliance"],
+        description: "Supporting Layers는 특정 한 단계에만 속하지 않고 전체 서비스에 걸쳐 적용되는 운영, 보안, 배포, 모니터링 요소입니다. Demo Flow 아래에서 전체 구조를 받쳐주는 기반 역할을 합니다.",
+        questions: ["사용자의 요청은 어떻게 서버까지 이동하는가?", "코드를 어떻게 테스트하고 배포할 것인가?", "민감한 의료 데이터는 어떻게 보호되는가?", "서비스 상태와 모델 성능은 어떻게 모니터링하는가?"],
+        concepts: ["Web Basics", "DevOps & Deployment", "Security & Compliance", "Monitoring & Operations"],
+        hierarchy: ["Web Basics", "DevOps & Deployment", "Security & Compliance", "Consent & Data Privacy", "Monitoring & Operations", "Error / Fallback Flow", "Project Management View"]
+      }
+    ];
+
+    const stageTranslations = {
+      en: {
+        user: {
+          flowSubtitle: "Service user",
+          subtitle: "Roles and access permissions",
+          description: "In an AI healthcare service, not every user should have the same permissions. Patients, doctors, nurses, researchers, and admins have different responsibilities, so the data and functions they can access must be separated by role.",
+          questions: ["Who is this user?", "What data can this user see?", "What functions can this user use?", "How far should this user’s healthcare data access go?"]
+        },
+        device: {
+          flowSubtitle: "Access device",
+          subtitle: "What device the user uses to access the service",
+          description: "Client Device means the physical device used to access the service. AI healthcare services must work reliably across smartphones, laptops, tablets, desktops, and hospital workstations.",
+          questions: ["What device is the user using?", "Does the page work well on mobile?", "Does it work on hospital PCs?", "Does the layout adapt to screen size?", "Does sensitive healthcare data remain on the device?"]
+        },
+        frontend: {
+          flowSubtitle: "Input and screen",
+          subtitle: "The screen and interaction layer users see",
+          description: "Frontend is the screen and interaction layer the user experiences first. It handles input, display, errors, and result presentation.",
+          questions: ["Can users enter data easily?", "Are error messages easy to understand?", "Are AI results displayed clearly?", "Could any wording be medically misleading?"]
+        },
+        network: {
+          flowSubtitle: "Web communication structure",
+          subtitle: "How the user request travels to the server",
+          description: "Network / Web Basics explains how a typed web address connects to a real server and how requests and responses move safely between browser and backend.",
+          questions: ["How does the entered address reach the server?", "How do requests and responses travel?", "Is healthcare data transmitted securely?"]
+        },
+        backend: {
+          flowSubtitle: "Request processing server",
+          subtitle: "Security, permissions, data, APIs, and operations",
+          description: "Backend is the central processing layer. It receives requests, checks permissions, validates data, connects to databases and AI models, and returns results.",
+          questions: ["Where does the user request arrive?", "Is the data validated?", "How is the AI model called?", "How are unauthorized users blocked?", "Can the service recover from failures?"]
+        },
+        model: {
+          flowSubtitle: "Analysis and prediction",
+          subtitle: "Model execution and governance",
+          description: "AI Model analyzes input data and produces predictions, classifications, summaries, or risk scores. In production, accuracy, explainability, bias checks, clinical review, and version control all matter.",
+          questions: ["What is the model input format?", "How are text, image, and numeric data preprocessed?", "Where does the model run?", "Is a GPU required?", "Can results be traced?", "Are model versions managed?"]
+        },
+        result: {
+          flowSubtitle: "Result delivery",
+          subtitle: "Safely presenting results",
+          description: "Result is the layer that presents AI output safely and understandably. It includes display, storage, traceability, safety messages, and error handling.",
+          questions: ["Can users understand the result?", "Does the AI output look too much like a medical decision?", "Are risk, probability, and explanation shown together?", "Are results stored and traceable?", "Which model version created the result?"]
+        },
+        supporting: {
+          flowSubtitle: "Operational foundation",
+          subtitle: "Shared foundation supporting the whole service",
+          description: "Supporting Layers are cross-cutting foundations such as operations, security, deployment, monitoring, and web basics. They support the whole demo flow underneath.",
+          questions: ["How does the request reach the server?", "How is code tested and deployed?", "How is sensitive healthcare data protected?", "How are service health and model performance monitored?"]
+        }
+      }
+    };
+
+    const hierarchyDescriptions = {
+      Patient: "서비스를 이용하는 환자입니다. 본인의 건강 정보와 AI 분석 결과를 확인할 수 있습니다.",
+      Doctor: "환자를 진료하는 의료진입니다. 담당 환자의 기록과 AI 결과를 임상 판단의 참고 자료로 활용할 수 있습니다.",
+      Nurse: "환자 케어와 진료 보조를 담당합니다. 업무 범위 내 필요한 정보에 접근합니다.",
+      Researcher: "연구 목적으로 데이터를 활용하는 사용자입니다. 익명화된 데이터만 사용해야 합니다.",
+      Admin: "시스템 운영과 사용자 권한 관리를 담당합니다.",
+      Smartphone: "모바일 환경에서 사용하는 기기입니다. 작은 화면에서도 입력과 결과 확인이 쉬워야 합니다.",
+      Laptop: "의사, 연구자, 관리자 등이 자주 사용하는 기기입니다. 웹 기반 이용에 적합합니다.",
+      Tablet: "병원 현장이나 회진 중 사용할 수 있는 기기입니다. 터치 사용성과 가독성이 중요합니다.",
+      Desktop: "장시간 분석이나 관리 작업에 적합한 기기입니다.",
+      "Hospital Workstation": "병원 내부 업무용 컴퓨터입니다. 병원 네트워크와 보안 정책을 고려해야 합니다.",
+      HTML: "웹페이지의 구조를 만드는 언어입니다.",
+      CSS: "웹페이지의 디자인과 레이아웃을 담당합니다.",
+      JavaScript: "버튼 클릭, 입력값 확인, API 요청, 결과 표시를 처리합니다.",
+      "Web / App Screen": "사용자가 실제로 보는 화면입니다.",
+      "User Input": "증상, 기록, 수치, 이미지, PDF 등 입력 데이터입니다.",
+      "Client-side Validation": "서버 전송 전 입력값을 기본 검증합니다.",
+      "State Management": "로그인, 로딩, 결과 상태를 관리합니다.",
+      "Error Message Handling": "입력 오류, 서버 오류, 권한 오류, 네트워크 오류 메시지를 보여줍니다.",
+      "Result Display": "AI 분석 결과를 화면에 보여주는 영역입니다.",
+      Domain: "사람이 읽기 쉬운 웹사이트 주소입니다.",
+      DNS: "도메인을 실제 서버 IP 주소로 바꿔주는 시스템입니다.",
+      "IP Address": "서버나 기기를 찾기 위한 실제 네트워크 주소입니다.",
+      "TCP/IP": "인터넷 데이터 통신의 기본 규칙입니다.",
+      Port: "서버 안에서 어떤 서비스에 연결할지 정하는 번호입니다.",
+      HTTP: "요청과 응답을 주고받는 웹 통신 규칙입니다.",
+      HTTPS: "암호화된 안전한 웹 통신 방식입니다.",
+      "API Gateway": "API 요청이 처음 들어오는 입구입니다.",
+      "Backend API": "프론트엔드와 서버를 연결하는 API 통로입니다.",
+      "Business Logic": "서비스의 실제 처리 규칙입니다.",
+      "Data Validation": "입력 데이터의 올바름을 검사합니다.",
+      "Auth & Permissions": "인증과 권한 관리를 담당합니다.",
+      "Database & Storage": "사용자, 환자, 기록, 파일, 결과 데이터를 저장합니다.",
+      "Security & Data Access": "의료 데이터 보호와 접근 통제를 담당합니다.",
+      "Rate Limiting": "너무 많은 요청을 제한합니다.",
+      Caching: "자주 쓰는 데이터를 임시 저장해 속도를 높입니다.",
+      "Load Balancing & Scaling": "트래픽 분산과 서버 확장을 담당합니다.",
+      "Observability & Logs": "에러, 요청, 응답 시간, 서버 상태를 기록/관찰합니다.",
+      "Availability & Recovery": "백업, 장애 대응, 복구 계획을 담당합니다.",
+      "Model Input Processing": "모델이 이해할 수 있도록 입력 데이터를 정리합니다.",
+      "Model Serving": "학습된 모델을 실제 서비스에서 실행 가능하게 운영합니다.",
+      "Cloud & Compute": "CPU, GPU, 메모리, 클라우드 자원을 의미합니다.",
+      "Prediction / Inference": "모델이 결과를 생성하는 과정입니다.",
+      "Model Monitoring": "응답 시간, 오류, 성능 저하를 추적합니다.",
+      "Model Governance": "모델 버전, 설명 가능성, bias check, clinical review를 관리합니다.",
+      "Backend Response": "AI 출력을 사용자 친화적인 응답 형식으로 정리합니다.",
+      "Result Storage": "분석 결과와 요청 기록을 저장합니다.",
+      "Frontend Display": "결과를 최종 화면에 표시합니다.",
+      "Clinical Safety Message": "AI 결과의 한계와 주의사항을 안내합니다.",
+      "Error Handling": "오류나 실패 상황을 안전하게 처리합니다.",
+      "Audit / Logs": "누가 언제 어떤 결과를 생성했는지 기록합니다."
+    };
+
+    const hierarchyDetails = {
+      Patient: {
+        icon: "🧑",
+        subtitle: "본인 기록 확인",
+        role: "서비스를 이용하는 환자입니다.",
+        dataAccess: "본인의 건강 정보와 AI 분석 결과만 확인할 수 있습니다.",
+        functions: "증상 입력, 결과 확인, 본인 기록 조회",
+        example: "환자가 스마트폰에서 증상을 입력하고 AI 위험도 결과를 확인합니다.",
+        keyPoint: "다른 환자의 의료 데이터에는 접근할 수 없어야 합니다."
+      },
+      Doctor: {
+        icon: "🩺",
+        subtitle: "담당 환자 관리",
+        role: "환자를 진료하는 의료진입니다.",
+        dataAccess: "담당 환자의 기록과 AI 분석 결과를 확인할 수 있습니다.",
+        functions: "환자 기록 검토, AI 결과 확인, 임상 판단 참고",
+        example: "의사가 진료기록 요약 AI 결과를 확인하고 환자 상담에 참고합니다.",
+        keyPoint: "AI 결과는 의료진의 판단을 보조하는 참고 자료로 사용되어야 합니다."
+      },
+      Nurse: {
+        icon: "💉",
+        subtitle: "케어 업무 지원",
+        role: "환자 케어와 진료 보조를 담당합니다.",
+        dataAccess: "업무 범위 내 필요한 환자 정보에 접근할 수 있습니다.",
+        functions: "환자 상태 확인, 케어 기록 확인, 알림 확인",
+        example: "간호사가 환자의 위험도 알림을 확인하고 케어 우선순위를 조정합니다.",
+        keyPoint: "업무에 필요한 최소한의 데이터만 접근해야 합니다."
+      },
+      Researcher: {
+        icon: "🔬",
+        subtitle: "익명화 데이터 활용",
+        role: "연구 목적으로 데이터를 활용하는 사용자입니다.",
+        dataAccess: "개인정보가 제거되거나 익명화된 데이터만 사용할 수 있습니다.",
+        functions: "데이터 분석, 모델 성능 검토, 연구 결과 확인",
+        example: "연구자가 익명화된 환자 데이터를 사용해 모델 성능을 평가합니다.",
+        keyPoint: "개인을 식별할 수 있는 정보는 제거되어야 합니다."
+      },
+      Admin: {
+        icon: "⚙️",
+        subtitle: "시스템 관리",
+        role: "시스템 운영과 사용자 권한 관리를 담당합니다.",
+        dataAccess: "시스템 설정과 사용자 권한 정보를 관리합니다.",
+        functions: "계정 관리, 권한 설정, 시스템 상태 확인",
+        example: "관리자가 의사, 간호사, 연구자의 접근 권한을 설정합니다.",
+        keyPoint: "관리자도 의료 데이터 접근은 최소 권한 원칙을 따라야 합니다."
+      },
+      Smartphone: {
+        icon: "📱",
+        subtitle: "모바일 접속",
+        role: "환자나 의료진이 이동 중 서비스에 접속하는 기기입니다.",
+        dataAccess: "로그인한 사용자에게 허용된 화면과 결과만 표시합니다.",
+        functions: "증상 입력, 알림 확인, 결과 조회",
+        example: "환자가 모바일에서 증상을 입력하고 AI 위험도 결과를 확인합니다.",
+        keyPoint: "작은 화면에서도 민감한 정보가 안전하고 읽기 쉽게 보여야 합니다."
+      },
+      Laptop: {
+        icon: "💻",
+        subtitle: "웹 기반 검토",
+        role: "의료진, 연구자, 관리자가 자주 사용하는 작업 기기입니다.",
+        dataAccess: "역할에 따라 환자 기록, 결과, 관리 데이터에 접근합니다.",
+        functions: "데이터 검토, 문서 확인, 대시보드 사용",
+        example: "의사가 노트북에서 환자 기록과 AI 요약 결과를 함께 확인합니다.",
+        keyPoint: "브라우저 호환성과 세션 보안이 중요합니다."
+      },
+      Tablet: {
+        icon: "📟",
+        subtitle: "현장 터치 사용",
+        role: "병원 현장이나 회진 중 사용할 수 있는 터치 기반 기기입니다.",
+        dataAccess: "진료 현장에서 필요한 환자 정보와 알림을 확인합니다.",
+        functions: "환자 상태 확인, 간단 입력, 결과 공유",
+        example: "회진 중 태블릿으로 AI 위험도 알림과 환자 요약을 확인합니다.",
+        keyPoint: "터치 사용성과 가독성이 좋아야 합니다."
+      },
+      Desktop: {
+        icon: "🖥️",
+        subtitle: "장시간 작업",
+        role: "관리자나 연구자가 장시간 분석 또는 운영 업무에 사용하는 기기입니다.",
+        dataAccess: "권한에 따라 관리 화면, 분석 결과, 운영 지표를 확인합니다.",
+        functions: "리포트 검토, 권한 관리, 데이터 분석",
+        example: "연구자가 데스크톱에서 모델 성능 리포트를 확인합니다.",
+        keyPoint: "큰 화면에서는 정보 밀도와 탐색 구조가 중요합니다."
+      },
+      "Hospital Workstation": {
+        icon: "🏥",
+        subtitle: "병원 업무용 PC",
+        role: "병원 내부 네트워크와 정책 안에서 사용하는 업무용 컴퓨터입니다.",
+        dataAccess: "병원 정책과 사용자 권한에 맞는 의료 데이터만 접근합니다.",
+        functions: "EMR 연동, 환자 기록 확인, 업무 시스템 접속",
+        example: "병원 PC에서 AI 결과를 EMR 참고 정보와 함께 확인합니다.",
+        keyPoint: "병원 보안 정책과 세션 관리 기준을 따라야 합니다."
+      },
+      HTML: {
+        icon: "📄",
+        subtitle: "화면 구조",
+        role: "웹페이지의 기본 구조를 만드는 언어입니다.",
+        dataAccess: "직접 데이터를 처리하지 않고 입력 폼과 결과 영역의 구조를 제공합니다.",
+        functions: "제목, 입력 폼, 버튼, 결과 영역 구성",
+        example: "증상 입력 폼과 AI 결과 표시 영역을 HTML로 구성합니다.",
+        keyPoint: "의미 있는 구조는 접근성과 유지보수성을 높입니다."
+      },
+      CSS: {
+        icon: "🎨",
+        subtitle: "디자인과 레이아웃",
+        role: "웹페이지의 시각 디자인과 반응형 레이아웃을 담당합니다.",
+        dataAccess: "데이터 자체에는 접근하지 않고 표시 방식과 가독성을 조정합니다.",
+        functions: "색상, 간격, 카드, 반응형 화면 구성",
+        example: "위험도 결과를 색상과 카드 레이아웃으로 쉽게 구분하게 만듭니다.",
+        keyPoint: "의료 정보는 명확하고 오해 없이 보여야 합니다."
+      },
+      JavaScript: {
+        icon: "⚡",
+        subtitle: "동적 상호작용",
+        role: "웹페이지를 동적으로 움직이게 하는 로직입니다.",
+        dataAccess: "사용자 입력값과 서버 응답 데이터를 화면에서 처리합니다.",
+        functions: "버튼 클릭, 입력값 확인, API 요청, 결과 표시",
+        example: "사용자가 제출 버튼을 누르면 AI 분석 요청을 보내고 결과를 렌더링합니다.",
+        keyPoint: "민감한 데이터는 브라우저에 불필요하게 오래 남기지 않아야 합니다."
+      },
+      "Web / App Screen": {
+        icon: "🧭",
+        subtitle: "사용자 화면",
+        role: "사용자가 실제로 보고 조작하는 화면입니다.",
+        dataAccess: "로그인 상태와 권한에 맞는 정보만 표시합니다.",
+        functions: "로그인, 입력, 업로드, 결과 확인 화면 제공",
+        example: "환자 정보 입력 화면과 AI 결과 화면을 제공합니다.",
+        keyPoint: "화면 흐름은 초보 사용자도 이해하기 쉬워야 합니다."
+      },
+      "User Input": {
+        icon: "⌨️",
+        subtitle: "의료 데이터 입력",
+        role: "사용자가 서비스에 제공하는 입력 데이터입니다.",
+        dataAccess: "증상, 진료기록, 검사 수치, 이미지, PDF 등이 포함될 수 있습니다.",
+        functions: "텍스트 입력, 수치 입력, 파일 업로드",
+        example: "환자가 증상과 검사 수치를 입력해 AI 위험도 분석을 요청합니다.",
+        keyPoint: "입력 데이터의 의미와 제한 사항을 명확히 안내해야 합니다."
+      },
+      "Client-side Validation": {
+        icon: "✅",
+        subtitle: "기본 입력 검증",
+        role: "서버로 보내기 전 브라우저에서 기본 오류를 확인합니다.",
+        dataAccess: "사용자가 입력한 값의 형식과 필수 여부를 확인합니다.",
+        functions: "필수값 확인, 파일 형식 확인, 오류 메시지 표시",
+        example: "PDF가 아닌 파일을 업로드하면 즉시 안내 메시지를 보여줍니다.",
+        keyPoint: "프론트엔드 검증은 편의 기능이며 백엔드 검증도 반드시 필요합니다."
+      },
+      "State Management": {
+        icon: "🔄",
+        subtitle: "화면 상태 관리",
+        role: "화면이 현재 어떤 상태인지 관리합니다.",
+        dataAccess: "로그인 여부, 로딩 상태, 분석 진행 상태, 결과 상태를 다룹니다.",
+        functions: "로딩 표시, 제출 버튼 비활성화, 결과 화면 전환",
+        example: "AI 분석 중에는 로딩 상태를 보여주고 중복 제출을 막습니다.",
+        keyPoint: "상태가 명확해야 사용자가 시스템을 신뢰할 수 있습니다."
+      },
+      "Error Message Handling": {
+        icon: "⚠️",
+        subtitle: "오류 안내",
+        role: "오류가 발생했을 때 사용자가 이해할 수 있게 안내합니다.",
+        dataAccess: "오류 코드와 상황 정보를 사용자 친화적으로 변환합니다.",
+        functions: "입력 오류, 서버 오류, 권한 오류, 네트워크 오류 표시",
+        example: "권한이 없는 환자 기록 접근 시 안전한 오류 메시지를 보여줍니다.",
+        keyPoint: "오류 메시지에 민감한 내부 정보가 노출되지 않아야 합니다."
+      },
+      "Result Display": {
+        icon: "📊",
+        subtitle: "결과 표시",
+        role: "AI 분석 결과를 사용자에게 보여주는 화면 영역입니다.",
+        dataAccess: "서버가 허용한 결과, 위험도, 설명, 주의 문구를 표시합니다.",
+        functions: "위험도 표시, 요약, 표, 그래프, 안전 문구 제공",
+        example: "AI 위험도를 색상과 설명 문구로 함께 표시합니다.",
+        keyPoint: "AI 결과가 진단처럼 보이지 않도록 표현을 조심해야 합니다."
+      },
+      Domain: {
+        icon: "🌍",
+        subtitle: "서비스 주소",
+        role: "사람이 읽기 쉬운 웹사이트 주소입니다.",
+        dataAccess: "데이터에 직접 접근하지 않고 서비스 위치를 찾는 출발점입니다.",
+        functions: "브라우저가 접속할 서비스 주소 제공",
+        example: "사용자가 health-ai-service.com 같은 주소를 입력합니다.",
+        keyPoint: "신뢰할 수 있는 도메인과 인증서 관리가 중요합니다."
+      },
+      DNS: {
+        icon: "📚",
+        subtitle: "주소 변환",
+        role: "도메인을 실제 서버 IP 주소로 바꿔주는 시스템입니다.",
+        dataAccess: "의료 데이터 내용이 아니라 서버 위치 정보를 다룹니다.",
+        functions: "도메인 조회, IP 주소 반환, 라우팅 지원",
+        example: "DNS가 서비스 도메인을 백엔드 서버 주소로 연결합니다.",
+        keyPoint: "DNS 장애는 서비스 접속 장애로 이어질 수 있습니다."
+      },
+      "IP Address": {
+        icon: "📍",
+        subtitle: "네트워크 위치",
+        role: "서버나 기기를 찾기 위한 실제 네트워크 주소입니다.",
+        dataAccess: "서비스 위치를 식별하며 의료 데이터 자체를 의미하지 않습니다.",
+        functions: "서버 위치 식별, 네트워크 연결 지원",
+        example: "브라우저가 IP 주소를 통해 서버와 연결을 시작합니다.",
+        keyPoint: "운영 환경에서는 IP 노출과 접근 제한을 관리해야 합니다."
+      },
+      "TCP/IP": {
+        icon: "🔗",
+        subtitle: "통신 규칙",
+        role: "인터넷에서 데이터를 주고받기 위한 기본 규칙입니다.",
+        dataAccess: "데이터 패킷의 전달 경로와 안정성을 담당합니다.",
+        functions: "목적지 찾기, 안정적인 데이터 전달",
+        example: "환자 입력 데이터가 패킷으로 나뉘어 서버까지 전달됩니다.",
+        keyPoint: "네트워크 안정성은 사용자 경험과 분석 속도에 영향을 줍니다."
+      },
+      Port: {
+        icon: "🚪",
+        subtitle: "서비스 입구",
+        role: "한 서버 안에서 어떤 서비스로 연결할지 정하는 번호입니다.",
+        dataAccess: "서비스 연결 경로를 구분하고 데이터 내용은 다루지 않습니다.",
+        functions: "HTTP, HTTPS, 개발 서버 포트 구분",
+        example: "HTTPS 서비스는 보통 443번 포트를 사용합니다.",
+        keyPoint: "불필요한 포트는 열어두지 않는 것이 안전합니다."
+      },
+      HTTP: {
+        icon: "📨",
+        subtitle: "요청과 응답",
+        role: "클라이언트와 서버가 요청과 응답을 주고받는 규칙입니다.",
+        dataAccess: "요청 본문과 응답 데이터 구조를 전달합니다.",
+        functions: "GET, POST, 응답 코드, API 호출",
+        example: "프론트엔드가 POST /predict 요청으로 분석을 요청합니다.",
+        keyPoint: "민감한 의료 데이터는 HTTP가 아닌 HTTPS로 전송해야 합니다."
+      },
+      HTTPS: {
+        icon: "🔒",
+        subtitle: "암호화 통신",
+        role: "HTTP에 암호화가 추가된 안전한 통신 방식입니다.",
+        dataAccess: "전송 중인 의료 데이터가 외부에 노출되지 않도록 보호합니다.",
+        functions: "암호화, 서버 인증, 안전한 API 통신",
+        example: "환자 기록 업로드가 HTTPS 연결을 통해 서버로 전송됩니다.",
+        keyPoint: "AI 헬스케어 서비스에서는 HTTPS가 필수입니다."
+      },
+      "API Gateway": {
+        icon: "🚦",
+        subtitle: "API 입구",
+        role: "API 요청이 처음 들어오는 입구입니다.",
+        dataAccess: "요청 메타데이터와 라우팅 정보를 처리합니다.",
+        functions: "요청 라우팅, 기본 검사, 제한 정책 적용",
+        example: "환자의 분석 요청을 적절한 백엔드 API로 전달합니다.",
+        keyPoint: "게이트웨이에서 인증과 제한 정책을 일관되게 적용할 수 있습니다."
+      },
+      "Backend API": {
+        icon: "🔌",
+        subtitle: "서버 통로",
+        role: "프론트엔드와 서버를 연결하는 약속된 API 통로입니다.",
+        dataAccess: "요청 데이터와 응답 데이터를 주고받습니다.",
+        functions: "POST /predict, GET /result/{id}, POST /upload",
+        example: "프론트엔드가 검사 수치를 보내면 API가 분석 요청을 처리합니다.",
+        keyPoint: "API 계약이 명확해야 프론트엔드와 백엔드가 안정적으로 연결됩니다."
+      },
+      "Business Logic": {
+        icon: "🧠",
+        subtitle: "처리 규칙",
+        role: "서비스의 실제 처리 흐름과 규칙입니다.",
+        dataAccess: "권한 확인 후 필요한 환자 데이터와 모델 입력 데이터를 다룹니다.",
+        functions: "데이터 조회, 모델 호출 준비, 응답 생성",
+        example: "의사의 요청인지 확인한 뒤 담당 환자 기록만 모델 분석에 사용합니다.",
+        keyPoint: "의료 업무 규칙과 권한 규칙이 코드에 정확히 반영되어야 합니다."
+      },
+      "Data Validation": {
+        icon: "🧪",
+        subtitle: "데이터 검증",
+        role: "입력 데이터가 올바른지 확인하는 과정입니다.",
+        dataAccess: "필수값, 데이터 타입, 파일 형식, 의료 수치 범위를 확인합니다.",
+        functions: "잘못된 입력 차단, 오류 반환, 모델 입력 보호",
+        example: "혈당 수치가 비정상 형식이면 분석 전에 오류를 반환합니다.",
+        keyPoint: "잘못된 데이터는 잘못된 AI 결과로 이어질 수 있습니다."
+      },
+      "Auth & Permissions": {
+        icon: "🪪",
+        subtitle: "인증과 권한",
+        role: "사용자가 누구인지 확인하고 접근 범위를 결정합니다.",
+        dataAccess: "사용자 계정, 역할, 토큰, 권한 정보를 다룹니다.",
+        functions: "로그인, 토큰 확인, RBAC, 접근 제어",
+        example: "환자는 본인 결과만 보고 의사는 담당 환자 결과만 확인합니다.",
+        keyPoint: "최소 권한 원칙이 의료 데이터 보호의 핵심입니다."
+      },
+      "Database & Storage": {
+        icon: "🗄️",
+        subtitle: "데이터 저장",
+        role: "사용자, 환자, 기록, 파일, 결과 데이터를 저장합니다.",
+        dataAccess: "의료 기록, 분석 결과, 이미지, PDF, JSON 데이터를 관리합니다.",
+        functions: "저장, 조회, 백업, 파일 관리",
+        example: "분석 결과와 모델 버전을 저장해 나중에 추적할 수 있게 합니다.",
+        keyPoint: "민감 정보는 암호화와 접근 제어가 필요합니다."
+      },
+      "Security & Data Access": {
+        icon: "🛡️",
+        subtitle: "보안과 접근",
+        role: "의료 데이터 보호와 접근 통제를 담당합니다.",
+        dataAccess: "개인정보, 의료 데이터, 접근 로그, 감사 기록을 관리합니다.",
+        functions: "암호화, 접근 제어, 감사 추적",
+        example: "누가 어떤 환자 결과를 확인했는지 감사 로그에 기록합니다.",
+        keyPoint: "보안은 기능 추가가 아니라 전체 구조에 포함되어야 합니다."
+      },
+      "Rate Limiting": {
+        icon: "⏱️",
+        subtitle: "요청 제한",
+        role: "너무 많은 요청을 제한해 시스템을 보호합니다.",
+        dataAccess: "요청 횟수, 사용자 또는 IP 기준 사용량을 확인합니다.",
+        functions: "남용 방지, 비용 보호, 모델 서버 보호",
+        example: "짧은 시간에 반복되는 AI 분석 요청을 제한합니다.",
+        keyPoint: "AI 모델 호출은 비용과 자원을 많이 쓰므로 제한 정책이 필요합니다."
+      },
+      Caching: {
+        icon: "⚡",
+        subtitle: "빠른 조회",
+        role: "자주 쓰는 데이터를 임시 저장해 응답 속도를 높입니다.",
+        dataAccess: "캐시 가능한 비민감 데이터나 제한된 결과를 관리합니다.",
+        functions: "응답 속도 향상, 서버 부하 감소",
+        example: "공통 안내 문구나 정적 리소스를 빠르게 제공합니다.",
+        keyPoint: "민감한 의료 데이터 캐시는 신중하게 설계해야 합니다."
+      },
+      "Load Balancing & Scaling": {
+        icon: "📈",
+        subtitle: "확장과 분산",
+        role: "트래픽을 여러 서버에 분산하고 자원을 확장합니다.",
+        dataAccess: "요청 흐름과 서버 상태를 기반으로 트래픽을 조정합니다.",
+        functions: "트래픽 분산, 서버 확장, 장애 완화",
+        example: "사용자가 많아지면 AI 분석 요청을 여러 서버로 나눕니다.",
+        keyPoint: "의료 서비스는 피크 시간에도 안정적으로 동작해야 합니다."
+      },
+      "Observability & Logs": {
+        icon: "📡",
+        subtitle: "상태 관찰",
+        role: "서비스 상태와 요청 흐름을 기록하고 관찰합니다.",
+        dataAccess: "API 로그, 오류, 응답 시간, 모델 처리 시간을 확인합니다.",
+        functions: "로그 수집, 성능 모니터링, 장애 원인 분석",
+        example: "모델 응답 시간이 느려졌는지 운영 대시보드에서 확인합니다.",
+        keyPoint: "로그에는 민감한 의료 데이터가 노출되지 않도록 해야 합니다."
+      },
+      "Availability & Recovery": {
+        icon: "🧯",
+        subtitle: "장애 대응",
+        role: "서비스가 안정적으로 운영되도록 복구 계획을 준비합니다.",
+        dataAccess: "백업 데이터, 복구 상태, 장애 기록을 관리합니다.",
+        functions: "백업, 장애 대응, 복구 절차, 안정성 관리",
+        example: "서버 장애 시 백업과 복구 절차로 서비스를 되살립니다.",
+        keyPoint: "헬스케어 서비스는 장애 대응 계획이 명확해야 합니다."
+      },
+      "Model Input Processing": {
+        icon: "🧹",
+        subtitle: "입력 전처리",
+        role: "모델이 이해할 수 있도록 데이터를 정리합니다.",
+        dataAccess: "텍스트, 이미지, 검사 수치, feature 데이터를 다룹니다.",
+        functions: "정규화, 변환, 결측 처리, 입력 포맷 구성",
+        example: "검사 수치를 모델 입력 형식으로 변환합니다.",
+        keyPoint: "전처리 방식은 결과 품질과 재현성에 직접 영향을 줍니다."
+      },
+      "Model Serving": {
+        icon: "🚀",
+        subtitle: "모델 실행",
+        role: "학습된 모델을 실제 서비스에서 호출 가능하게 운영합니다.",
+        dataAccess: "모델 입력 데이터와 예측 출력을 처리합니다.",
+        functions: "모델 API, GPU 서버, 외부 AI API 호출",
+        example: "백엔드가 모델 서버에 위험도 예측 요청을 보냅니다.",
+        keyPoint: "모델 serving은 속도, 비용, 안정성을 함께 고려해야 합니다."
+      },
+      "Cloud & Compute": {
+        icon: "☁️",
+        subtitle: "실행 자원",
+        role: "모델과 서비스를 실행하기 위한 컴퓨팅 자원입니다.",
+        dataAccess: "데이터 처리에 필요한 CPU, GPU, 메모리 자원을 사용합니다.",
+        functions: "모델 추론, 서버 실행, 확장 가능한 인프라 제공",
+        example: "이미지 분석 모델은 GPU 서버에서 실행될 수 있습니다.",
+        keyPoint: "의료 데이터 위치와 클라우드 보안 정책을 함께 고려해야 합니다."
+      },
+      "Prediction / Inference": {
+        icon: "🔮",
+        subtitle: "예측 생성",
+        role: "모델이 입력 데이터를 분석해 결과를 만드는 과정입니다.",
+        dataAccess: "전처리된 입력 데이터와 모델 출력을 다룹니다.",
+        functions: "위험도 예측, 분류, 요약, 이상 징후 탐지",
+        example: "환자의 검사 수치를 기반으로 위험도 점수를 생성합니다.",
+        keyPoint: "예측 결과는 진단이 아니라 의사결정 보조 정보입니다."
+      },
+      "Model Monitoring": {
+        icon: "📉",
+        subtitle: "모델 관찰",
+        role: "모델이 안정적으로 동작하는지 확인합니다.",
+        dataAccess: "응답 시간, 오류, 예측 분포, 성능 지표를 추적합니다.",
+        functions: "latency 확인, drift 감지, 실패 요청 분석",
+        example: "특정 기간 이후 예측 분포가 달라졌는지 확인합니다.",
+        keyPoint: "모델 성능은 배포 후에도 계속 변할 수 있습니다."
+      },
+      "Model Governance": {
+        icon: "📜",
+        subtitle: "책임 있는 관리",
+        role: "모델을 책임 있게 운영하기 위한 관리 체계입니다.",
+        dataAccess: "모델 버전, 결과 추적, 설명 가능성, 검토 기록을 관리합니다.",
+        functions: "버전 관리, bias check, clinical review, audit",
+        example: "어떤 모델 버전이 어떤 결과를 만들었는지 추적합니다.",
+        keyPoint: "AI 헬스케어에서는 설명 가능성과 임상 검토가 중요합니다."
+      },
+      "Backend Response": {
+        icon: "📦",
+        subtitle: "응답 정리",
+        role: "AI 출력을 사용자에게 전달하기 좋은 형식으로 정리합니다.",
+        dataAccess: "모델 출력, 위험도, 설명 문구, JSON 응답을 다룹니다.",
+        functions: "결과 포맷팅, 메시지 생성, 위험도 등급 변환",
+        example: "모델 점수를 낮음/중간/높음 위험도로 변환합니다.",
+        keyPoint: "응답은 사용자와 화면이 이해하기 쉬운 구조여야 합니다."
+      },
+      "Result Storage": {
+        icon: "💾",
+        subtitle: "결과 저장",
+        role: "분석 결과와 요청 기록을 저장합니다.",
+        dataAccess: "결과, 요청 시간, 사용자, 모델 버전 정보를 저장합니다.",
+        functions: "결과 조회, 감사, 추적, 재검토 지원",
+        example: "의사가 이전 AI 분석 결과를 다시 확인할 수 있게 저장합니다.",
+        keyPoint: "저장 기간과 접근 권한을 명확히 관리해야 합니다."
+      },
+      "Frontend Display": {
+        icon: "🪟",
+        subtitle: "화면 표시",
+        role: "최종 결과를 화면에 표시하는 영역입니다.",
+        dataAccess: "서버가 전달한 결과와 설명만 표시합니다.",
+        functions: "위험도, 그래프, 표, 요약, 다운로드 제공",
+        example: "위험도 결과를 카드와 그래프로 보여줍니다.",
+        keyPoint: "표현 방식이 의료적 오해를 만들지 않아야 합니다."
+      },
+      "Clinical Safety Message": {
+        icon: "🧾",
+        subtitle: "안전 문구",
+        role: "AI 결과의 한계와 주의사항을 안내합니다.",
+        dataAccess: "결과 해석에 필요한 안전 안내 문구를 표시합니다.",
+        functions: "참고용 안내, 의료진 검토 안내, 응급 상황 안내",
+        example: "AI 결과는 의료진의 판단을 대체하지 않는다는 문구를 표시합니다.",
+        keyPoint: "사용자가 AI 결과를 진단으로 오해하지 않게 해야 합니다."
+      },
+      "Error Handling": {
+        icon: "🛠️",
+        subtitle: "오류 처리",
+        role: "오류나 실패 상황을 안전하게 처리합니다.",
+        dataAccess: "오류 유형, 실패 원인, 사용자 권한 상태를 확인합니다.",
+        functions: "모델 실패, 서버 오류, 데이터 부족, 권한 없음 처리",
+        example: "입력 데이터가 부족하면 분석 대신 안내 메시지를 보여줍니다.",
+        keyPoint: "오류 상황에서도 민감 정보가 노출되지 않아야 합니다."
+      },
+      "Audit / Logs": {
+        icon: "🧾",
+        subtitle: "추적 기록",
+        role: "누가 언제 어떤 결과를 생성했는지 기록합니다.",
+        dataAccess: "사용자, 입력 유형, 모델 버전, 결과 생성 시간을 기록합니다.",
+        functions: "감사 추적, 재현성 확인, 보안 검토",
+        example: "어떤 의사가 어떤 모델 버전의 결과를 확인했는지 기록합니다.",
+        keyPoint: "추적성은 의료 AI의 신뢰성과 책임성을 높입니다."
+      },
+      "Web Basics": {
+        icon: "🌐",
+        subtitle: "웹 통신 기반",
+        role: "사용자 요청이 서비스 서버까지 이동하도록 돕는 기본 웹 구조입니다.",
+        dataAccess: "도메인, DNS, IP 주소, HTTP/HTTPS 요청과 응답 정보를 다룹니다.",
+        functions: "주소 해석, 서버 연결, 요청 전달, 안전한 통신 지원",
+        example: "환자가 웹 주소를 입력하면 DNS와 HTTPS를 거쳐 AI 헬스케어 백엔드로 요청이 전달됩니다.",
+        keyPoint: "의료 데이터 전송에는 HTTPS와 안전한 네트워크 설정이 필수입니다."
+      },
+      "DevOps & Deployment": {
+        icon: "🚀",
+        subtitle: "배포와 운영 자동화",
+        role: "코드를 안정적으로 관리, 테스트, 배포하는 운영 기반입니다.",
+        dataAccess: "소스 코드, 배포 설정, 환경 변수, 릴리스 기록을 다룹니다.",
+        functions: "버전 관리, 자동 테스트, 배포, 롤백, 환경 설정 관리",
+        example: "새 AI 결과 화면을 GitHub에 반영하고 CI/CD로 테스트 후 클라우드에 배포합니다.",
+        keyPoint: "운영 자동화는 빠른 개선과 안정적인 서비스 운영을 동시에 지원합니다."
+      },
+      "Security & Compliance": {
+        icon: "🛡️",
+        subtitle: "보안과 규정 준수",
+        role: "개인정보와 의료 데이터를 보호하고 정책을 준수하도록 관리합니다.",
+        dataAccess: "사용자 신원, 권한, 암호화 설정, 감사 로그, 동의 정보를 다룹니다.",
+        functions: "인증, 권한 관리, 암호화, 감사 추적, 개인정보 보호",
+        example: "의사만 담당 환자 결과를 볼 수 있도록 권한을 제한하고 접근 기록을 남깁니다.",
+        keyPoint: "헬스케어 AI에서는 보안과 규정 준수가 기능만큼 중요합니다."
+      },
+      "Monitoring & Operations": {
+        icon: "📡",
+        subtitle: "모니터링과 장애 대응",
+        role: "서비스와 모델이 안정적으로 작동하는지 관찰하고 문제에 대응합니다.",
+        dataAccess: "API 로그, 오류, 서버 상태, 모델 응답 시간, 사용량 지표를 다룹니다.",
+        functions: "로그 확인, 에러 추적, 알림, 백업, 복구",
+        example: "AI 모델 응답 시간이 느려지면 운영자가 알림을 받고 원인을 확인합니다.",
+        keyPoint: "운영 모니터링은 서비스 신뢰성과 환자 안전을 지키는 기반입니다."
+      }
+    };
+
+    Object.assign(hierarchyDescriptions, {
+      "REST API / JSON Flow": "프론트엔드와 백엔드가 REST API와 JSON 형식으로 요청과 응답을 주고받는 흐름입니다.",
+      "Consent & Data Privacy": "사용자 동의와 개인정보 보호 기준을 서비스 전반에 적용하는 운영 요소입니다.",
+      "Human-in-the-loop Review": "AI 결과를 사람, 특히 의료진이 검토하고 최종 판단을 보완하는 구조입니다.",
+      "Model Version Tracking": "어떤 모델 버전이 어떤 결과를 만들었는지 추적하는 관리 방식입니다.",
+      "Error / Fallback Flow": "오류나 장애가 발생했을 때 안전한 대체 흐름과 안내 메시지를 제공하는 구조입니다.",
+      "Project Management View": "기능, 권한, 데이터, 운영, 위험을 PM 관점에서 연결해 보는 구조입니다."
+    });
+
+    Object.assign(hierarchyDetails, {
+      "REST API / JSON Flow": {
+        icon: "🔁",
+        title: "REST API / JSON 흐름",
+        subtitle: "요청과 JSON 응답",
+        role: "프론트엔드와 백엔드가 약속된 API 규칙으로 데이터를 주고받는 흐름입니다.",
+        dataAccess: "요청 본문, 응답 JSON, 상태 코드, API 경로 정보를 처리합니다.",
+        functions: "REST 요청, JSON 응답, 상태 코드 반환, API 계약 관리",
+        example: "프론트엔드가 환자 입력값을 JSON으로 보내면 백엔드가 AI 위험도 결과를 JSON 응답으로 반환합니다.",
+        keyPoint: "API 요청과 응답 구조가 명확해야 프론트엔드, 백엔드, 결과 화면이 안정적으로 연결됩니다."
+      },
+      "Consent & Data Privacy": {
+        icon: "🔐",
+        title: "동의 관리 및 데이터 개인정보 보호",
+        subtitle: "동의와 개인정보 보호",
+        role: "사용자 동의와 개인정보 보호 기준을 서비스 전반에 적용합니다.",
+        dataAccess: "동의 상태, 개인정보, 의료 데이터, 데이터 사용 목적, 접근 기록을 관리합니다.",
+        functions: "동의 확인, 최소 데이터 사용, 익명화, 접근 제한, 보관 정책 적용",
+        example: "환자가 동의한 범위 안에서만 AI 분석에 필요한 데이터를 사용하고 접근 기록을 남깁니다.",
+        keyPoint: "헬스케어 AI에서는 기능보다 먼저 데이터 사용 목적과 동의 범위가 명확해야 합니다."
+      },
+      "Human-in-the-loop Review": {
+        icon: "🩺",
+        title: "Human-in-the-loop 검토",
+        subtitle: "사람 검토",
+        role: "AI 결과를 의료진이나 담당자가 검토해 최종 판단을 보완하는 구조입니다.",
+        dataAccess: "AI 결과, 위험도, 설명, 환자 기록 요약, 검토 상태를 다룹니다.",
+        functions: "의료진 검토, 승인 또는 보류, 위험 알림, 임상 판단 보조",
+        example: "AI가 높은 위험도를 표시하면 의사가 결과와 환자 기록을 검토한 뒤 상담에 참고합니다.",
+        keyPoint: "AI 결과는 자동 결정이 아니라 사람의 판단을 돕는 참고 정보로 설계되어야 합니다."
+      },
+      "Model Version Tracking": {
+        icon: "🏷️",
+        title: "모델 버전 추적",
+        subtitle: "모델 버전 추적",
+        role: "결과를 만든 모델 버전과 실행 정보를 추적합니다.",
+        dataAccess: "모델 버전 ID, 배포 시간, 입력 스키마, 예측 결과, 감사 로그를 저장합니다.",
+        functions: "모델 등록, 버전 관리, 결과 추적, 재현성 확인",
+        example: "의료진이 확인한 AI 결과가 v2.1 모델에서 생성되었음을 감사 로그로 확인합니다.",
+        keyPoint: "모델 버전이 추적되어야 결과를 설명하고 문제 발생 시 원인을 찾을 수 있습니다."
+      },
+      "Error / Fallback Flow": {
+        icon: "🧯",
+        title: "오류 및 대체 흐름",
+        subtitle: "안전한 오류 대응",
+        role: "오류나 장애가 발생했을 때 안전한 대체 흐름과 안내를 제공합니다.",
+        dataAccess: "오류 코드, 실패 원인, 요청 ID, 재시도 상태, 장애 로그를 처리합니다.",
+        functions: "오류 감지, fallback 메시지, 재시도, 운영 알림, 복구 절차 연결",
+        example: "AI 모델 호출이 실패하면 결과 대신 안전한 안내 메시지를 보여주고 운영 로그에 기록합니다.",
+        keyPoint: "오류 상황에서도 사용자가 잘못된 의료 판단을 하지 않도록 안전하게 안내해야 합니다."
+      },
+      "Project Management View": {
+        icon: "📌",
+        subtitle: "PM 운영 관점",
+        role: "서비스 구조를 기능, 이해관계자, 권한, 위험, 운영 기준으로 연결해 봅니다.",
+        dataAccess: "요구사항, 이해관계자, 권한 매트릭스, 릴리스 계획, 위험 기록을 다룹니다.",
+        functions: "범위 정의, 이해관계자 정렬, 권한 검토, 배포 준비, 모니터링 계획",
+        example: "PM이 환자, 의사, 간호사, 관리자, 연구자의 요구사항과 권한을 한 흐름에서 정리합니다.",
+        keyPoint: "이 구조는 개발 구조이면서 동시에 실제 서비스 운영을 관리하기 위한 PM 지도입니다."
+      }
+    });
+
+    const supportGroups = {
+      "A. Web Basics": ["Domain", "DNS", "HTTP / HTTPS", "TCP/IP", "Port"],
+      "B. DevOps & Deployment": ["GitHub", "Version Control", "CI/CD", "Docker", "Cloud Deployment", "Environment Variables", "Release Management"],
+      "C. Security & Compliance": ["Authentication", "Authorization", "Encryption", "Access Control", "Audit Log", "Data Privacy", "Consent Management", "Compliance Check"],
+      "D. Monitoring & Operations": ["API Logs", "Error Tracking", "Server Monitoring", "Model Latency", "Usage Monitoring", "Alerting", "Backup", "Recovery"]
+    };
+
+    const supportDescriptions = {
+      "HTTP / HTTPS": "클라이언트와 서버가 요청과 응답을 주고받는 방식입니다. HTTPS는 암호화된 안전한 통신입니다.",
+      GitHub: "코드를 저장하고 협업하는 플랫폼입니다.",
+      "Version Control": "코드 변경 이력을 관리하는 방식입니다.",
+      "CI/CD": "코드를 테스트하고 자동 배포하는 과정입니다.",
+      Docker: "애플리케이션 실행 환경을 컨테이너로 묶는 기술입니다.",
+      "Cloud Deployment": "서비스를 클라우드 환경에 배포하는 과정입니다.",
+      "Environment Variables": "설정값과 비밀 정보를 코드와 분리해 관리하는 방식입니다.",
+      "Release Management": "새로운 기능과 수정 사항의 배포를 관리하는 과정입니다.",
+      Authentication: "사용자가 누구인지 확인하는 과정입니다.",
+      Authorization: "인증된 사용자의 접근 범위를 결정합니다.",
+      Encryption: "데이터를 암호화하여 보호합니다.",
+      "Access Control": "권한 있는 사용자만 접근 가능하게 제한합니다.",
+      "Audit Log": "접근 기록과 행위를 추적하는 로그입니다.",
+      "Data Privacy": "개인정보와 의료 데이터를 보호하는 원칙입니다.",
+      "Consent Management": "사용자의 데이터 활용 동의를 관리합니다.",
+      "Compliance Check": "법규와 정책 준수 여부를 확인합니다.",
+      "API Logs": "API 호출 기록입니다.",
+      "Error Tracking": "오류를 수집하고 분석합니다.",
+      "Server Monitoring": "서버 상태를 확인합니다.",
+      "Model Latency": "모델 응답 시간을 측정합니다.",
+      "Usage Monitoring": "사용 패턴을 관찰합니다.",
+      Alerting: "문제 발생 시 알림을 보냅니다.",
+      Backup: "데이터 복사본을 저장합니다.",
+      Recovery: "장애 시 서비스를 복구합니다."
+    };
+
+    const englishItemText = {
+      Patient: ["Patient", "Own record access", "A patient who uses the service.", "Only their own health information and AI analysis results.", "Enter symptoms, view results, and review personal records.", "A patient enters symptoms on a smartphone and checks an AI risk result.", "Patients must not access other patients’ medical data."],
+      Doctor: ["Doctor", "Assigned patient care", "A clinician who treats patients.", "Assigned patient records and AI analysis results.", "Review patient records, check AI results, and support clinical judgment.", "A doctor reviews an AI-generated clinical note summary before a consultation.", "AI output should support, not replace, clinical judgment."],
+      Nurse: ["Nurse", "Care workflow support", "A care professional supporting patient care and clinical work.", "Patient information needed within the nurse’s work scope.", "Check patient status, care records, and alerts.", "A nurse reviews a risk alert and adjusts care priority.", "Access should be limited to the minimum necessary data."],
+      Researcher: ["Researcher", "De-identified data use", "A user who analyzes data for research purposes.", "Only de-identified or anonymized data.", "Analyze data, review model performance, and inspect research results.", "A researcher evaluates model performance using anonymized patient data.", "Identifiable personal information must be removed."],
+      Admin: ["Admin", "System management", "A user who manages system operations and user permissions.", "System settings and user permission information.", "Manage accounts, configure permissions, and check system status.", "An admin configures access for doctors, nurses, and researchers.", "Admins should also follow least-privilege access to medical data."],
+      Smartphone: ["Smartphone", "Mobile access", "A mobile device used to access the service.", "Only screens and results allowed for the logged-in user.", "Symptom input, alerts, and result lookup.", "A patient checks an AI risk result on a phone.", "Sensitive data must remain readable and secure on small screens."],
+      Laptop: ["Laptop", "Web-based review", "A common work device for doctors, researchers, and admins.", "Role-based access to records, results, and dashboards.", "Review data, inspect documents, and use dashboards.", "A doctor reviews patient notes and AI summaries on a laptop.", "Browser compatibility and session security matter."],
+      Tablet: ["Tablet", "Touch-friendly clinical use", "A touch device used in clinical rounds or hospital workflows.", "Patient information and alerts needed in the care context.", "Check status, enter simple notes, and share results.", "A clinician reviews AI risk alerts during rounds.", "Touch usability and readability are important."],
+      Desktop: ["Desktop", "Long-session work", "A device for longer analysis or administration work.", "Operational, analytics, or management data depending on role.", "Review reports, manage permissions, and analyze data.", "A researcher checks model performance reports on a desktop.", "Large screens need clear navigation and information density."],
+      "Hospital Workstation": ["Hospital Workstation", "Hospital work PC", "A workstation used inside hospital networks and policies.", "Healthcare data allowed by hospital policy and user role.", "EMR integration, patient lookup, and clinical system access.", "A clinician reviews AI results alongside EMR information.", "Hospital security policy and session management must be followed."],
+      HTML: ["HTML", "Page structure", "The language that defines the webpage structure.", "It structures forms, buttons, and result areas rather than processing data directly.", "Create headings, forms, buttons, and result sections.", "Build the symptom input form and AI result area.", "Semantic structure improves accessibility and maintainability."],
+      CSS: ["CSS", "Design and layout", "The styling layer for layout and visual presentation.", "It controls how data is displayed, not the data itself.", "Colors, spacing, cards, and responsive layouts.", "Display risk levels clearly with cards and colors.", "Medical information must be clear and not misleading."],
+      JavaScript: ["JavaScript", "Dynamic interaction", "The logic that makes the page interactive.", "User input and server response data in the browser.", "Handle clicks, validate input, call APIs, and render results.", "Send an AI analysis request and display the response.", "Sensitive data should not remain unnecessarily in the browser."],
+      "Web / App Screen": ["Web / App Screen", "User-facing screen", "The interface the user sees and operates.", "Only information allowed for the user’s login and role.", "Login, input, upload, and result screens.", "Provide a patient input screen and AI result screen.", "The flow should be understandable for non-technical users."],
+      "User Input": ["User Input", "Healthcare data input", "Data entered by the user.", "Symptoms, notes, lab values, images, or PDFs.", "Text input, numeric input, and file upload.", "A patient enters symptoms and lab values for risk analysis.", "Input meaning and limits should be clearly explained."],
+      "Client-side Validation": ["Client-side Validation", "Basic input check", "Browser-side checks before sending data to the server.", "Input format, required fields, and file types.", "Check required values, file type, and basic errors.", "Show a message when a non-PDF file is uploaded.", "Frontend validation improves UX but backend validation is still required."],
+      "State Management": ["State Management", "Screen state", "Management of the current UI state.", "Login, loading, analysis, and result states.", "Show loading, prevent duplicate submission, and switch views.", "Show analysis progress while the AI request runs.", "Clear state helps users trust the system."],
+      "Error Message Handling": ["Error Message Handling", "Error guidance", "User-friendly handling of problems and failures.", "Error codes, permission states, and failure conditions.", "Show input, server, permission, and network errors.", "Show a safe message for unauthorized record access.", "Error messages must not expose sensitive internal details."],
+      "Result Display": ["Result Display", "Result presentation", "The area that shows AI analysis results.", "Results, risk levels, explanations, and safety messages.", "Display risk, summaries, tables, charts, and warnings.", "Show AI risk level with explanation and caution text.", "AI results should not look like a final diagnosis."],
+      Domain: ["Domain", "Service address", "A human-readable website address.", "Service location information, not medical data.", "Provide a service address users can enter.", "A user enters a health AI service domain.", "Trusted domains and certificates are important."],
+      DNS: ["DNS", "Address resolution", "The system that maps a domain to a server IP address.", "Server location records.", "Resolve domain names and route users to servers.", "DNS connects the service domain to backend infrastructure.", "DNS problems can cause service access failures."],
+      "IP Address": ["IP Address", "Network location", "A network address for finding a server or device.", "Network location information.", "Identify server location and support network connection.", "The browser connects to the server IP after DNS lookup.", "IP exposure and access rules should be managed."],
+      "TCP/IP": ["TCP/IP", "Communication rules", "Core internet rules for sending data.", "Packet delivery and routing information.", "Find destinations and deliver data reliably.", "Patient input travels to the backend as network packets.", "Network stability affects analysis speed and user experience."],
+      Port: ["Port", "Service entry point", "A number that identifies which service to connect to on a server.", "Connection path information.", "Separate HTTP, HTTPS, and development services.", "HTTPS usually uses port 443.", "Unnecessary ports should not be left open."],
+      HTTP: ["HTTP", "Request and response", "A web communication protocol between client and server.", "Request body, headers, and response structure.", "GET, POST, status codes, and API calls.", "Frontend sends POST /predict for analysis.", "Sensitive healthcare data should use HTTPS, not plain HTTP."],
+      HTTPS: ["HTTPS", "Encrypted communication", "Secure HTTP with encryption.", "Healthcare data in transit.", "Encryption, server authentication, and secure API communication.", "A patient record upload is sent through HTTPS.", "HTTPS is required for AI healthcare services."],
+      "API Gateway": ["API Gateway", "API entry point", "The first entry point for API requests.", "Request metadata and routing information.", "Route requests, run basic checks, and apply limits.", "Route a patient analysis request to the correct backend API.", "Gateway policies can apply authentication and rate limits consistently."],
+      "Backend API": ["Backend API", "Server interface", "A defined API path connecting frontend and server.", "Request and response data.", "POST /predict, GET /result/{id}, and file upload APIs.", "Receive lab values and return AI risk results.", "Clear API contracts keep frontend and backend aligned."],
+      "Business Logic": ["Business Logic", "Processing rules", "The service rules that decide what happens in a request.", "Authorized patient and model input data.", "Lookup data, prepare model calls, and format responses.", "Use only assigned patient data for a doctor’s AI request.", "Clinical workflow and permission rules must be correctly reflected."],
+      "Data Validation": ["Data Validation", "Data quality check", "Checks whether input data is valid.", "Required fields, data types, file formats, and medical value ranges.", "Block invalid input and protect model inputs.", "Reject malformed blood glucose values before analysis.", "Bad data can produce bad AI results."],
+      "Auth & Permissions": ["Auth & Permissions", "Identity and access", "Confirms who the user is and what they can access.", "Accounts, roles, tokens, and permissions.", "Login, token checks, RBAC, and access control.", "Patients see only their own results; doctors see assigned patients.", "Least privilege is central to healthcare data protection."],
+      "Database & Storage": ["Database & Storage", "Data persistence", "Stores users, records, files, and results.", "Medical records, AI results, images, PDFs, and JSON data.", "Store, retrieve, back up, and manage files.", "Save analysis results with model version for traceability.", "Sensitive data needs encryption and access control."],
+      "Security & Data Access": ["Security & Data Access", "Security controls", "Protects healthcare data and controls access.", "Personal data, medical data, access logs, and audit records.", "Encryption, access control, and audit trails.", "Record who viewed which AI result and when.", "Security must be built into the whole architecture."],
+      "Rate Limiting": ["Rate Limiting", "Request control", "Limits excessive requests to protect systems.", "Request counts and usage by user or IP.", "Prevent abuse and protect model resources.", "Limit repeated AI analysis requests in a short time.", "AI calls can be expensive, so limits are important."],
+      Caching: ["Caching", "Fast lookup", "Temporarily stores frequently used data.", "Cache-safe data or selected results.", "Improve response speed and reduce server load.", "Serve common guidance text or static resources quickly.", "Caching sensitive healthcare data requires careful design."],
+      "Load Balancing & Scaling": ["Load Balancing & Scaling", "Scale and distribute", "Distributes traffic and scales server resources.", "Traffic flow and server health data.", "Route traffic, scale services, and reduce failures.", "Spread AI analysis requests across multiple servers.", "Healthcare services must stay stable during peak usage."],
+      "Observability & Logs": ["Observability & Logs", "Service visibility", "Records and observes service behavior.", "API logs, errors, latency, and model processing time.", "Collect logs, monitor performance, and analyze failures.", "Monitor whether model response time is slowing down.", "Logs must not expose sensitive healthcare data."],
+      "Availability & Recovery": ["Availability & Recovery", "Failure recovery", "Keeps the service stable and recoverable.", "Backup data, recovery state, and incident records.", "Backups, disaster recovery, failover, and stability management.", "Recover service after a backend outage.", "Healthcare services need clear recovery plans."],
+      "Model Input Processing": ["Model Input Processing", "Input preprocessing", "Prepares data so the model can understand it.", "Text, image, lab value, and feature data.", "Normalize, transform, handle missing values, and format inputs.", "Convert lab values into model-ready features.", "Preprocessing affects quality and reproducibility."],
+      "Model Serving": ["Model Serving", "Model runtime", "Makes a trained model callable in production.", "Model inputs and prediction outputs.", "Expose model APIs, GPU serving, or external model calls.", "Backend sends a risk prediction request to a model server.", "Serving must balance speed, cost, and reliability."],
+      "Cloud & Compute": ["Cloud & Compute", "Execution resources", "Compute resources used to run services and models.", "CPU, GPU, memory, and cloud resources.", "Run servers, inference, and scalable infrastructure.", "Image models may run on GPU instances.", "Data location and cloud security policies matter."],
+      "Prediction / Inference": ["Prediction / Inference", "Result generation", "The process where the model generates outputs.", "Preprocessed model inputs and outputs.", "Risk prediction, classification, summarization, and detection.", "Generate a risk score from patient lab values.", "Predictions support decisions but are not diagnoses."],
+      "Model Monitoring": ["Model Monitoring", "Model visibility", "Checks whether the model works reliably after deployment.", "Latency, errors, prediction distribution, and performance metrics.", "Track latency, drift, and failed requests.", "Check whether prediction patterns changed over time.", "Model performance can change after deployment."],
+      "Model Governance": ["Model Governance", "Responsible model management", "Manages models responsibly across their lifecycle.", "Model versions, explanation, review, and audit records.", "Version control, bias checks, clinical review, and traceability.", "Track which model version produced each result.", "Explainability and clinical review are essential in healthcare AI."],
+      "Backend Response": ["Backend Response", "Response formatting", "Formats AI output for user-facing delivery.", "Model output, risk score, messages, and response schema.", "Format results, map risk levels, and generate JSON.", "Convert a model score into low/medium/high risk.", "Responses should be easy for UI and users to understand."],
+      "Result Storage": ["Result Storage", "Result history", "Stores analysis results and request history.", "Result, request time, user, and model version.", "Support lookup, audit, and review.", "Allow doctors to review previous AI analysis results.", "Retention and access rules must be clear."],
+      "Frontend Display": ["Frontend Display", "Final presentation", "Displays the final result in the UI.", "Allowed result data and explanations from the backend.", "Show risk, charts, tables, summaries, and downloads.", "Display risk result as a card and chart.", "Presentation must not create medical misunderstanding."],
+      "Clinical Safety Message": ["Clinical Safety Message", "Safety guidance", "Explains limits and cautions for AI output.", "Safety text needed for result interpretation.", "Show reference-only, human review, and emergency guidance.", "Display that AI does not replace clinician judgment.", "Users must not confuse AI output with diagnosis."],
+      "Error Handling": ["Error Handling", "Failure handling", "Handles errors and failure cases safely.", "Error type, failure cause, and permission status.", "Handle model failure, server errors, missing data, and denied access.", "Show guidance when input data is insufficient.", "Errors must not leak sensitive internal details."],
+      "Audit / Logs": ["Audit / Logs", "Trace records", "Records who created or viewed what result and when.", "User, input type, model version, and result timestamp.", "Audit trail, reproducibility, and security review.", "Record which doctor viewed which model result.", "Traceability supports trust and accountability."],
+      "Web Basics": ["Web Basics", "Web communication foundation", "The web foundation that moves requests from users to servers.", "Domain, DNS, IP address, HTTP/HTTPS request and response data.", "Resolve addresses, connect to servers, and support secure communication.", "A patient request reaches the backend through DNS and HTTPS.", "HTTPS and secure network setup are required for healthcare data."],
+      "DevOps & Deployment": ["DevOps & Deployment", "Deployment automation", "The foundation for managing, testing, and deploying code safely.", "Source code, deployment settings, environment variables, and release history.", "Version control, automated testing, deployment, rollback, and configuration.", "A new AI result screen is tested in CI/CD and deployed to cloud.", "Automation supports fast improvement and stable operations."],
+      "Security & Compliance": ["Security & Compliance", "Security and compliance", "Protects personal and medical data and supports policy compliance.", "Identity, permissions, encryption settings, audit logs, and consent data.", "Authentication, authorization, encryption, audit, and privacy controls.", "Restrict doctors to assigned patient results and record access logs.", "Security and compliance are as important as product features."],
+      "Monitoring & Operations": ["Monitoring & Operations", "Monitoring and incident response", "Observes service and model health and supports issue response.", "API logs, errors, server health, model latency, and usage metrics.", "Logging, error tracking, alerting, backup, and recovery.", "Alert operators when AI model latency increases.", "Monitoring protects service reliability and patient safety."]
+    };
+
+    const englishFallbackDetail = (item) => {
+      const ko = hierarchyDetails[item];
+      if (!ko) {
+        return {
+          icon: "•",
+          subtitle: "Component",
+          role: `${item} is a supporting part of the production architecture.`,
+          dataAccess: "It handles the data or operational state needed for its layer.",
+          functions: "It supports stable service flow and production operations.",
+          example: `In an AI healthcare service, ${item} supports the end-to-end workflow.`,
+          keyPoint: "Permissions, security, and traceability should be considered."
+        };
+      }
+      return {
+        icon: ko.icon,
+        subtitle: ko.subtitle,
+        role: `${item} is a component of the production architecture.`,
+        dataAccess: "It handles the data or state required by this stage.",
+        functions: ko.functions || "It supports the service workflow.",
+        example: `In an AI healthcare service, ${item} supports the workflow safely.`,
+        keyPoint: "Design this component with security, clarity, and traceability."
+      };
+    };
+
+    const detailTranslations = { en: englishItemText };
+
+    Object.assign(detailTranslations.en, {
+      "REST API / JSON Flow": ["REST API / JSON Flow", "Requests and JSON responses", "A defined flow where frontend and backend exchange data through REST APIs and JSON.", "Request body, response JSON, status codes, and API route information.", "Send REST requests, return JSON responses, manage status codes, and keep API contracts clear.", "The frontend sends patient input as JSON, and the backend returns an AI risk result as a JSON response.", "Clear request and response structures keep frontend, backend, and result screens aligned."],
+      "Consent & Data Privacy": ["Consent & Data Privacy", "Consent and privacy protection", "Applies user consent and privacy rules across the service.", "Consent status, personal data, medical data, data-use purpose, and access records.", "Check consent, minimize data use, de-identify data, restrict access, and apply retention rules.", "Only data covered by patient consent is used for AI analysis, and access is logged.", "In healthcare AI, data purpose and consent scope must be clear before features are built."],
+      "Human-in-the-loop Review": ["Human-in-the-loop Review", "Human review", "A workflow where clinicians or responsible users review AI results before they influence decisions.", "AI output, risk level, explanation, patient summary, and review status.", "Clinical review, approval or hold, risk alerting, and decision support.", "When AI marks a high-risk result, a doctor reviews the result and patient context before consultation.", "AI should support human judgment, not become an automatic medical decision."],
+      "Model Version Tracking": ["Model Version Tracking", "Model version traceability", "Tracks which model version created each result.", "Model version ID, deployment time, input schema, prediction result, and audit log.", "Register models, manage versions, trace results, and support reproducibility.", "An audit log shows that a reviewed AI result was generated by model v2.1.", "Model traceability helps explain results and investigate issues."],
+      "Error / Fallback Flow": ["Error / Fallback Flow", "Safe failure response", "Provides a safe alternative path when an error or outage occurs.", "Error code, failure reason, request ID, retry state, and incident logs.", "Detect errors, show fallback messages, retry safely, alert operations, and connect to recovery steps.", "If the AI model call fails, the UI shows safe guidance instead of a misleading result and records the event.", "Even in failures, the service should prevent unsafe medical interpretation."],
+      "Project Management View": ["Project Management View", "PM operations lens", "Connects the service architecture to scope, stakeholders, permissions, risks, and operations.", "Requirements, stakeholders, permission matrix, release plan, and risk register.", "Define scope, align stakeholders, review permissions, prepare releases, and plan monitoring.", "A PM maps patient, doctor, nurse, admin, and researcher needs into one service workflow.", "This architecture is also a PM map for managing a real healthcare AI service."]
+    });
+
+    const relatedExamplesByItem = {
+      Patient: ["Patient Portal", "Mobile App", "Personal Health Record", "Consent UI"],
+      Doctor: ["Clinician Dashboard", "EMR / EHR", "Clinical Decision Support", "FHIR"],
+      Nurse: ["Care Dashboard", "Alert Queue", "Task Management", "Nursing Notes"],
+      Researcher: ["De-identified Dataset", "Data Warehouse", "Jupyter Notebook", "Model Evaluation Report"],
+      Admin: ["Admin Console", "RBAC", "IAM", "Audit Log"],
+      Smartphone: ["iOS Safari", "Android Chrome", "Responsive Web App", "Push Notification"],
+      Laptop: ["Chrome", "Edge", "VPN", "Secure Session"],
+      Tablet: ["Touch UI", "Responsive Design", "Tablet Rounds Workflow", "Offline-safe Form"],
+      Desktop: ["Admin Dashboard", "Analytics Workspace", "Large-screen Layout", "Secure Browser"],
+      "Hospital Workstation": ["Hospital Network", "VDI", "EMR Integration", "Device Policy"],
+      HTML: ["Semantic HTML", "Forms", "ARIA", "Input Elements"],
+      CSS: ["Responsive CSS", "Flexbox", "CSS Grid", "Design Tokens"],
+      JavaScript: ["Fetch API", "DOM Events", "Form Validation", "State Updates"],
+      "Web / App Screen": ["Figma", "Design System", "Wireframe", "User Flow"],
+      "User Input": ["Form Fields", "File Upload", "Textarea", "Lab Value Input"],
+      "Client-side Validation": ["HTML5 Validation", "JavaScript Validation", "File Type Check", "Required Fields"],
+      "State Management": ["Loading State", "Error State", "Result State", "Session State"],
+      "Error Message Handling": ["Toast", "Inline Error", "HTTP Status", "Retry Pattern"],
+      "Result Display": ["Chart", "Table", "Risk Badge", "Download Report"],
+      Domain: ["Cloudflare Registrar", "Route 53 Domains", "Google Domains", "Custom Domain"],
+      DNS: ["Cloudflare DNS", "AWS Route 53", "Google Cloud DNS", "Azure DNS"],
+      "IP Address": ["Public IP", "Private IP", "VPC", "Load Balancer IP"],
+      "TCP/IP": ["TCP", "IP", "TLS Handshake", "Network Routing"],
+      Port: ["443 HTTPS", "80 HTTP", "8000 Dev Server", "Firewall Rules"],
+      HTTP: ["GET", "POST", "Status Codes", "Headers"],
+      HTTPS: ["TLS", "SSL Certificate", "Let's Encrypt", "Certificate Manager"],
+      "API Gateway": ["Kong", "NGINX", "AWS API Gateway", "Apigee"],
+      "Backend API": ["FastAPI", "Django REST Framework", "Express", "OpenAPI"],
+      "Business Logic": ["Service Layer", "Use Case Flow", "Rules Engine", "Workflow Orchestration"],
+      "Data Validation": ["Pydantic", "JSON Schema", "Cerberus", "Great Expectations"],
+      "Auth & Permissions": ["OAuth 2.0", "JWT", "RBAC", "Okta"],
+      "Database & Storage": ["PostgreSQL", "MongoDB", "AWS S3", "Azure Blob Storage"],
+      "Security & Data Access": ["Encryption", "IAM", "Audit Trail", "DLP"],
+      "Rate Limiting": ["NGINX Rate Limit", "Redis", "API Gateway Throttling", "Cloudflare Rules"],
+      Caching: ["Redis", "CDN Cache", "Browser Cache", "CloudFront"],
+      "Load Balancing & Scaling": ["AWS ALB", "NGINX", "Kubernetes HPA", "Auto Scaling"],
+      "Observability & Logs": ["Prometheus", "Grafana", "Datadog", "CloudWatch"],
+      "Availability & Recovery": ["Backup Plan", "Disaster Recovery", "Health Checks", "Failover"],
+      "Model Input Processing": ["pandas", "NumPy", "scikit-learn Pipeline", "DICOM Preprocessing"],
+      "Model Serving": ["FastAPI", "TorchServe", "BentoML", "SageMaker Endpoint"],
+      "Cloud & Compute": ["AWS EC2", "Google Cloud Run", "Azure ML Compute", "GPU Instance"],
+      "Prediction / Inference": ["scikit-learn", "XGBoost", "PyTorch", "Transformers"],
+      "Model Monitoring": ["MLflow", "Evidently AI", "Prometheus", "Grafana"],
+      "Model Governance": ["Model Registry", "Model Card", "Bias Check", "Clinical Review"],
+      "Backend Response": ["JSON", "REST Response", "Risk Mapping", "Response Schema"],
+      "Result Storage": ["PostgreSQL", "Object Storage", "Audit Table", "Result History"],
+      "Frontend Display": ["Chart.js", "Table UI", "Risk Badge", "PDF Export"],
+      "Clinical Safety Message": ["Disclaimer", "Human Review", "Emergency Guidance", "Clinical Safety Copy"],
+      "Error Handling": ["Error Boundary", "Retry Logic", "HTTP Error Codes", "Fallback UI"],
+      "Audit / Logs": ["Audit Log", "CloudWatch Logs", "Datadog Logs", "SIEM"],
+      "Role-Based Access Control (RBAC)": ["RBAC Matrix", "IAM Policy", "Okta Groups", "Permission Table"],
+      "Permission Management": ["Access Policy", "Least Privilege", "Role Matrix", "Admin Console"],
+      "User Management": ["User Directory", "IAM", "SSO", "Account Provisioning"],
+      "Identity Management": ["Okta", "Auth0", "Azure AD", "OAuth 2.0"],
+      "Responsive Design": ["CSS Grid", "Media Queries", "Mobile-first Layout", "Viewport Testing"],
+      "Browser Compatibility": ["Chrome", "Safari", "Edge", "Cross-browser Testing"],
+      "Mobile App": ["iOS", "Android", "React Native", "App Store Review"],
+      "Web App": ["SPA", "PWA", "Static Hosting", "Web Browser"],
+      "Device Security": ["Session Timeout", "Device Policy", "MDM", "Secure Storage"],
+      React: ["React", "Component State", "Hooks", "React Router"],
+      Vue: ["Vue", "Composition API", "Vue Router", "Pinia"],
+      Angular: ["Angular", "RxJS", "Angular Router", "Forms"],
+      Vercel: ["Vercel", "Preview Deployments", "Edge Network", "Environment Variables"],
+      Netlify: ["Netlify", "Static Hosting", "Forms", "Deploy Preview"],
+      "AWS Amplify": ["Amplify Hosting", "Auth", "API", "Storage"],
+      Figma: ["Figma", "Design System", "Prototype", "Component Library"],
+      "Tailwind CSS": ["Utility Classes", "Responsive Variants", "Design Tokens", "Tailwind Config"],
+      "Material UI": ["MUI Components", "Theme", "Data Grid", "Accessible UI"],
+      Cloudflare: ["Cloudflare DNS", "CDN", "WAF", "SSL/TLS"],
+      "AWS Route 53": ["Hosted Zone", "DNS Record", "Health Check", "Domain Routing"],
+      "Google Cloud DNS": ["Managed Zone", "DNS Record", "Cloud Load Balancing", "IAM"],
+      "SSL/TLS Certificate": ["TLS", "Certificate Manager", "Let's Encrypt", "HTTPS"],
+      FastAPI: ["FastAPI", "Pydantic", "OpenAPI", "Uvicorn"],
+      Flask: ["Flask", "Blueprints", "Gunicorn", "REST API"],
+      Django: ["Django", "Django REST Framework", "ORM", "Admin"],
+      "Node.js / Express": ["Node.js", "Express", "Middleware", "REST API"],
+      Postman: ["Postman", "API Collection", "Environment", "Test Scripts"],
+      "Swagger / OpenAPI": ["OpenAPI Spec", "Swagger UI", "API Contract", "Schema"],
+      PostgreSQL: ["PostgreSQL", "Relational DB", "Indexes", "Transactions"],
+      MySQL: ["MySQL", "Relational DB", "SQL", "Replication"],
+      MongoDB: ["MongoDB", "Document DB", "Collections", "Indexes"],
+      "AWS S3": ["S3 Bucket", "Object Storage", "Lifecycle Policy", "Encryption"],
+      "Google Cloud Storage": ["GCS Bucket", "Object Storage", "IAM", "Lifecycle Rules"],
+      "Azure Blob Storage": ["Blob Container", "Object Storage", "Access Tier", "Encryption"],
+      "AWS EC2": ["EC2", "Security Group", "AMI", "Auto Scaling"],
+      "AWS Lambda": ["Lambda", "Serverless", "Triggers", "IAM Role"],
+      "Google Cloud Run": ["Cloud Run", "Container", "Autoscaling", "Revision"],
+      "Azure App Service": ["App Service", "Deployment Slot", "Managed Identity", "Scaling"],
+      "AWS SageMaker": ["SageMaker Endpoint", "Model Registry", "Training Job", "Monitoring"],
+      "Google Vertex AI": ["Vertex AI Endpoint", "Model Registry", "Pipelines", "Monitoring"],
+      "Azure Machine Learning": ["Azure ML", "Endpoint", "Compute Cluster", "Model Registry"],
+      "Hugging Face": ["Hub", "Inference Endpoint", "Transformers", "Spaces"],
+      Docker: ["Dockerfile", "Container Image", "Docker Compose", "Registry"],
+      Kubernetes: ["Deployment", "Service", "HPA", "Ingress"],
+      MLflow: ["Experiment Tracking", "Model Registry", "Metrics", "Artifacts"],
+      "Evidently AI": ["Data Drift", "Model Monitoring", "Reports", "Dashboards"],
+      "Prometheus / Grafana": ["Prometheus Metrics", "Grafana Dashboard", "Alert Rules", "Latency Charts"],
+      "Traceability": ["Audit Trail", "Model Version", "Request ID", "Result History"]
+    };
+
+    Object.assign(relatedExamplesByItem, {
+      Patient: ["Patient Portal", "Mobile Health App", "Personal Health Record", "MFA"],
+      Doctor: ["EMR / EHR System", "Clinical Dashboard", "Role-Based Access Control", "Audit Logs"],
+      Nurse: ["Nursing Dashboard", "Care Management System", "Mobile Clinical App", "Access Logs"],
+      Researcher: ["De-identified Dataset", "Research Data Platform", "Jupyter Notebook", "Data Access Review"],
+      Admin: ["Admin Console", "Identity Management", "Access Control", "Splunk Enterprise Security"],
+      Smartphone: ["iPhone", "Android Phone", "iOS", "Android", "Mobile Browser", "Mobile App"],
+      Laptop: ["Windows Laptop", "MacBook", "Chrome Browser", "Safari Browser", "Edge Browser", "VPN"],
+      Tablet: ["iPad", "Android Tablet", "Touch-friendly UI", "Responsive Design", "Mobile App"],
+      Desktop: ["Windows Desktop", "macOS Desktop", "Chrome", "Edge", "Safari", "Endpoint Security"],
+      "Hospital Workstation": ["Hospital Workstation", "EMR Terminal", "Thin Client", "Shared Clinical Computer", "Hospital Network"],
+      "Device Security": ["MDM", "EMM", "Endpoint Detection", "Device Compliance Check", "Cisco Secure Endpoint"],
+      "Browser Compatibility": ["Chrome", "Safari", "Edge", "Firefox", "Responsive Testing", "Cross-browser Testing"],
+      HTML: ["HTML5", "Semantic HTML", "Form Elements", "Accessibility", "ARIA Labels"],
+      CSS: ["CSS3", "Flexbox", "Grid", "Responsive Design", "Tailwind CSS", "Material UI"],
+      JavaScript: ["Vanilla JavaScript", "TypeScript", "Fetch API", "Axios", "Form Validation"],
+      "Web / App Screen": ["React", "Vue", "Angular", "Figma", "Design System"],
+      "User Input": ["Form Input", "File Upload", "Clinical Note Input", "Symptom Checklist", "Image Upload"],
+      "Client-side Validation": ["JavaScript Validation", "Zod", "Yup", "HTML Form Validation", "File Type Check"],
+      "State Management": ["React State", "Redux", "Zustand", "Vuex", "Loading State"],
+      "Error Message Handling": ["Toast Message", "Error Boundary", "Form Error Message", "Sentry"],
+      "Result Display": ["React", "Chart.js", "D3.js", "Table UI", "Risk Score Card", "Clinical Summary Card"],
+      "Frontend Hosting": ["Vercel", "Netlify", "AWS Amplify", "Cloudflare Pages"],
+      Domain: ["Cloudflare", "AWS Route 53", "Google Cloud DNS"],
+      DNS: ["Cloudflare DNS", "AWS Route 53", "Google Cloud DNS", "Cisco Umbrella"],
+      "IP Address": ["VPC Networking", "Subnet Design", "AWS VPC", "Azure Virtual Network"],
+      "TCP/IP": ["Network Routing", "Firewall Policy", "VPN", "Cisco Networking"],
+      Port: ["HTTPS 443", "HTTP 80", "Backend Dev Port 8000", "Firewall Port Rule"],
+      HTTP: ["REST API", "OpenAPI", "Postman", "Swagger"],
+      HTTPS: ["SSL/TLS Certificate", "Cloudflare SSL", "AWS Certificate Manager"],
+      "VPN / Secure Access": ["VPN", "Zero Trust Network Access", "MFA", "Cisco Secure Client"],
+      "Network Monitoring": ["Network Logs", "Cisco ThousandEyes", "Splunk Observability Cloud"],
+      "API Gateway": ["AWS API Gateway", "Kong", "NGINX", "Apigee"],
+      "Backend API": ["FastAPI", "Flask", "Django REST Framework", "Node.js / Express", "Swagger / OpenAPI"],
+      "Business Logic": ["Python Service Layer", "Node.js Service Layer", "Domain Service Pattern", "Microservices Architecture"],
+      "Data Validation": ["Pydantic", "Marshmallow", "Joi", "Zod", "OpenAPI Schema Validation"],
+      "Auth & Permissions": ["OAuth 2.0", "JWT", "Auth0", "Keycloak", "Cisco Duo"],
+      "Database & Storage": ["PostgreSQL", "MySQL", "MongoDB", "AWS S3", "Google Cloud Storage", "Azure Blob Storage"],
+      "Security & Data Access": ["TLS Encryption", "IAM", "AWS KMS", "HashiCorp Vault", "Splunk Enterprise Security"],
+      "Rate Limiting": ["NGINX Rate Limiting", "Redis", "Kong Plugins", "AWS API Gateway Throttling"],
+      Caching: ["Redis", "Memcached", "CDN Cache", "Cloudflare CDN"],
+      "Load Balancing & Scaling": ["NGINX", "AWS Elastic Load Balancing", "Kubernetes", "Auto Scaling"],
+      "Observability & Logs": ["Prometheus", "Grafana", "ELK Stack", "Splunk Observability Cloud", "Splunk Enterprise"],
+      "Availability & Recovery": ["Backup Snapshots", "Multi-AZ Deployment", "Disaster Recovery Plan", "Failover Cluster", "Splunk IT Service Intelligence"],
+      "Model Input Processing": ["pandas", "NumPy", "OpenCV", "Hugging Face Tokenizer", "scikit-learn Preprocessing"],
+      "Model Serving": ["FastAPI", "TorchServe", "TensorFlow Serving", "BentoML", "Docker", "Kubernetes"],
+      "Cloud & Compute": ["AWS SageMaker", "Google Vertex AI", "Azure Machine Learning", "NVIDIA GPU", "Kubernetes"],
+      "Prediction / Inference": ["PyTorch", "TensorFlow", "scikit-learn", "ONNX Runtime", "Hugging Face"],
+      "Model Monitoring": ["MLflow", "Evidently AI", "Prometheus", "Grafana", "Splunk Observability Cloud"],
+      "Model Governance": ["MLflow Model Registry", "Weights & Biases", "Model Card", "Audit Trail System"],
+      "Clinical Review": ["Human-in-the-loop Review", "Clinical Validation Workflow", "Model Card", "Bias Check", "Audit Logs"],
+      "Backend Response": ["JSON Response", "REST API Response", "OpenAPI Response Schema", "FastAPI Response Model"],
+      "Result Storage": ["PostgreSQL", "MongoDB", "AWS S3", "Azure Blob Storage"],
+      "Frontend Display": ["React", "Vue", "Angular", "Chart.js", "D3.js"],
+      "Clinical Safety Message": ["Clinical Disclaimer", "Human-in-the-loop Review", "Risk Communication", "Clinical Review Workflow"],
+      "Error Handling": ["Sentry", "Error Logs", "Splunk Observability Cloud", "Cisco AppDynamics"],
+      "Audit / Logs": ["Access Logs", "Compliance Logs", "Audit Trail System", "Splunk Enterprise", "Splunk Enterprise Security"],
+      "Model Version Tracking": ["MLflow Model Registry", "Model Card", "Audit Logs"],
+      "Web Basics": ["Cloudflare", "AWS Route 53", "Google Cloud DNS", "Cisco Umbrella"],
+      "DevOps & Deployment": ["GitHub", "GitHub Actions", "Docker", "Kubernetes", "AWS", "Google Cloud", "Azure"],
+      "Security & Compliance": ["IAM", "OAuth 2.0", "JWT", "Encryption", "Audit Logs", "Cisco Duo", "Splunk Enterprise Security"],
+      "Monitoring & Operations": ["Prometheus", "Grafana", "Sentry", "Cisco ThousandEyes", "Cisco AppDynamics", "Splunk Observability Cloud", "Splunk IT Service Intelligence"],
+      "Device & Access Management": ["MDM", "EMM", "Endpoint Security", "Cisco Secure Endpoint", "Cisco Duo"],
+      GitHub: ["GitHub Repository", "Pull Request", "Issues", "GitHub Actions"],
+      "Version Control": ["Git", "GitHub", "Branching", "Commit History"],
+      "CI/CD": ["GitHub Actions", "GitLab CI", "CircleCI", "Azure DevOps"],
+      "Cloud Deployment": ["AWS", "Google Cloud", "Azure", "Cloud Run"],
+      "Environment Variables": [".env", "Secrets Manager", "Parameter Store", "Runtime Config"],
+      "Release Management": ["Release Notes", "Version Tag", "Rollback Plan", "Deployment Checklist"],
+      Authentication: ["OAuth 2.0", "OpenID Connect", "JWT", "SSO"],
+      Authorization: ["RBAC", "ABAC", "Permission Matrix", "Policy Engine"],
+      Encryption: ["TLS", "AES-256", "KMS", "At-rest Encryption"],
+      "Access Control": ["IAM", "RBAC", "Least Privilege", "Access Review"],
+      "Audit Log": ["Audit Trail", "CloudTrail", "SIEM", "Access Log"],
+      "Data Privacy": ["HIPAA", "PIPEDA", "GDPR", "De-identification"],
+      "Consent Management": ["Consent Form", "Preference Center", "Data Use Agreement", "Audit Record"],
+      "Compliance Check": ["HIPAA Review", "SOC 2", "Security Checklist", "Policy Audit"],
+      "API Logs": ["CloudWatch Logs", "Datadog Logs", "ELK Stack", "Request ID"],
+      "Error Tracking": ["Sentry", "Datadog", "Rollbar", "Error Alerts"],
+      "Server Monitoring": ["CloudWatch", "Prometheus", "Grafana", "Uptime Check"],
+      "Model Latency": ["Latency Dashboard", "P95 Latency", "Prometheus", "Grafana"],
+      "Usage Monitoring": ["Analytics", "Audit Dashboard", "Usage Metrics", "Quota Tracking"],
+      Alerting: ["PagerDuty", "Slack Alerts", "CloudWatch Alarms", "Grafana Alerts"],
+      Backup: ["Snapshot", "Point-in-time Recovery", "S3 Backup", "Database Dump"],
+      Recovery: ["Disaster Recovery Plan", "Restore Test", "Failover", "Runbook"],
+      "REST API / JSON Flow": ["REST API", "JSON Request", "JSON Response", "GET / POST", "Status Code", "OpenAPI", "Swagger", "FastAPI"],
+      "Consent & Data Privacy": ["Consent Management", "Data Privacy", "De-identification", "Data Retention Policy", "Access Control", "Audit Logs"],
+      "Human-in-the-loop Review": ["Clinical Review", "Doctor Confirmation", "Human-in-the-loop", "Escalation Workflow", "Clinical Safety Check"],
+      "Model Version Tracking": ["Model Registry", "MLflow Model Registry", "Model Card", "Prediction Traceability", "Audit Trail", "Model Version ID"],
+      "Error / Fallback Flow": ["Error Handling", "Fallback Message", "Sentry", "Error Logs", "Splunk Observability Cloud", "Retry Logic"],
+      "Project Management View": ["Stakeholder Map", "RACI", "Risk Register", "Release Plan", "Monitoring Plan", "Clinical Safety Review"]
+    });
+
+    const flowRow = document.getElementById("flowRow");
+    const summaryGrid = document.getElementById("summaryGrid");
+    const detailWrap = document.getElementById("detailWrap");
+    const detailPanel = document.getElementById("detailPanel");
+    const supportWrap = document.getElementById("supportWrap");
+    const supportPanel = document.getElementById("supportPanel");
+    const summaryWrap = document.getElementById("summaryWrap");
+    const pmWrap = document.getElementById("pmWrap");
+
+    let activeStageId = null;
+
+    function uiText() {
+      return translations[currentLanguage];
+    }
+
+    function getStageText(stage) {
+      const translated = stageTranslations[currentLanguage]?.[stage.id] || {};
+      return {
+        ...stage,
+        flowSubtitle: translated.flowSubtitle || stage.flowSubtitle,
+        subtitle: translated.subtitle || stage.subtitle,
+        description: translated.description || stage.description,
+        questions: translated.questions || stage.questions
+      };
+    }
+
+    function renderStaticText() {
+      const t = uiText();
+      document.documentElement.lang = currentLanguage;
+      document.title = t.title;
+      document.getElementById("mainTitle").textContent = t.title;
+      document.getElementById("mainSubtitle").textContent = t.subtitle;
+      document.getElementById("demoBarLabel").textContent = t.demoFlow;
+      document.getElementById("supportingBandLabel").textContent = t.supportingLayersBand;
+      document.getElementById("production-title").textContent = t.productionTitle;
+      document.getElementById("productionSubtitle").textContent = t.productionSubtitle;
+      document.getElementById("expandAll").textContent = t.expandAll;
+      document.getElementById("collapseAll").textContent = t.collapseAll;
+      document.getElementById("summaryToggle").textContent = t.finalSummary;
+      document.getElementById("pmToggle").textContent = t.projectManagementView;
+      document.getElementById("finalSummaryTitle").textContent = t.finalSummaryTitle;
+      document.getElementById("footerSummaryText").innerHTML = t.footerSummary;
+      document.getElementById("pmViewTitle").textContent = t.pmViewTitle;
+      document.getElementById("pmViewContent").innerHTML = t.pmViewHtml;
+      document.getElementById("langEn").classList.toggle("active", currentLanguage === "en");
+      document.getElementById("langKo").classList.toggle("active", currentLanguage === "ko");
+    }
+
+    function renderFlow() {
+      flowRow.innerHTML = stages.filter((stage) => stage.id !== "supporting").map((stage) => {
+        const text = getStageText(stage);
+        return `
+        <div class="flow-card" style="--accent:${stage.accent}">
+          <div>
+            <span class="flow-icon">${stage.icon}</span>
+            <span class="flow-title">${stage.title}</span>
+            <span class="flow-subtitle">${text.flowSubtitle}</span>
+          </div>
+        </div>
+      `;
+      }).join("");
+    }
+
+    function renderSummaryCards() {
+      const t = uiText();
+      summaryGrid.innerHTML = stages.map((stage) => {
+        const text = getStageText(stage);
+        return `
+        <button class="summary-card" type="button" style="--accent:${stage.accent}" data-stage="${stage.id}" aria-expanded="false">
+          <span class="summary-top">
+            <span class="stage-number">${stage.number}</span>
+            <span class="summary-icon">${stage.icon}</span>
+          </span>
+          <h3>${stage.title}</h3>
+          <p>${text.subtitle}</p>
+          <ul class="preview-list">
+            ${stage.preview.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+          <span class="card-action">${t.clickForDetail}</span>
+        </button>
+      `;
+      }).join("");
+    }
+
+    function getHierarchyDetail(item) {
+      let detail = hierarchyDetails[item] || {
+        icon: "•",
+        subtitle: "구성 요소",
+        role: hierarchyDescriptions[item] || "Production 구조 안에서 필요한 세부 요소입니다.",
+        dataAccess: "해당 단계에서 필요한 데이터나 상태 정보를 처리합니다.",
+        functions: "서비스 흐름을 안정적으로 연결하고 지원합니다.",
+        example: "AI 헬스케어 서비스에서 전체 요청 흐름의 일부로 사용됩니다.",
+        keyPoint: "권한, 보안, 추적 가능성을 함께 고려해야 합니다."
+      };
+      if (currentLanguage === "en") {
+        const en = detailTranslations.en[item] || englishFallbackDetail(item);
+        if (Array.isArray(en)) {
+          detail = {
+            icon: detail.icon || "•",
+            title: en[0],
+            subtitle: en[1],
+            role: en[2],
+            dataAccess: en[3],
+            functions: en[4],
+            example: en[5],
+            keyPoint: en[6]
+          };
+        } else {
+          detail = en;
+        }
+      }
+      return {
+        title: detail.title || item,
+        icon: detail.icon || "•",
+        subtitle: detail.subtitle || "구성 요소",
+        role: detail.role || hierarchyDescriptions[item] || supportDescriptions[item] || "Production 구조 안에서 필요한 세부 요소입니다.",
+        dataAccess: detail.dataAccess || detail.handledData || "해당 단계에서 필요한 데이터나 상태 정보를 처리합니다.",
+        mainFunctions: detail.mainFunctions || detail.functions || "서비스 흐름을 안정적으로 연결하고 지원합니다.",
+        healthcareExample: detail.healthcareExample || detail.example || "AI 헬스케어 서비스에서 전체 요청 흐름의 일부로 사용됩니다.",
+        keyPoint: detail.keyPoint || "권한, 보안, 추적 가능성을 함께 고려해야 합니다.",
+        relatedExamples: detail.relatedExamples || relatedExamplesByItem[item] || ["Documentation", "Best Practice", "Security Review"]
+      };
+    }
+
+    function renderHierarchyDetail(item) {
+      const detail = getHierarchyDetail(item);
+      const labels = uiText().detailLabels;
+      return `
+        <div class="selected-detail">
+          <div>
+            <div class="selected-detail-title">${detail.icon} ${detail.title}</div>
+            <div class="hierarchy-card-subtitle">${detail.subtitle}</div>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">${labels.role}</span>
+            <span class="detail-row-text">${detail.role}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">${labels.dataAccess}</span>
+            <span class="detail-row-text">${detail.dataAccess}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">${labels.mainFunctions}</span>
+            <span class="detail-row-text">${detail.mainFunctions}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">${labels.healthcareExample}</span>
+            <span class="detail-row-text">${detail.healthcareExample}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-row-label">${labels.keyPoint}</span>
+            <span class="detail-row-text">${detail.keyPoint}</span>
+          </div>
+          <div class="related-examples-box">
+            <span class="related-examples-title">${labels.relatedExamples}</span>
+            <div class="related-tag-row">
+              ${detail.relatedExamples.map((example) => `<span class="related-tag">${example}</span>`).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getTabHtml(stage) {
+      const t = uiText();
+      const text = getStageText(stage);
+      return `
+        <div class="detail-tabs" role="tablist" aria-label="${stage.title} detail tabs">
+          <button type="button" class="detail-tab ${activeTabId === "overview" ? "active" : ""}" data-tab="overview">${t.tabs.overview}</button>
+          <button type="button" class="detail-tab ${activeTabId === "questions" ? "active" : ""}" data-tab="questions">${t.tabs.questions}</button>
+          <button type="button" class="detail-tab ${activeTabId === "hierarchy" ? "active" : ""}" data-tab="hierarchy">${t.tabs.hierarchy}</button>
+        </div>
+        <div class="info-card">
+          <div class="tab-content ${activeTabId === "overview" ? "active" : ""}" data-content="overview">
+            <h3>${t.tabs.overview}</h3>
+            <p>${text.description}</p>
+          </div>
+          <div class="tab-content ${activeTabId === "questions" ? "active" : ""}" data-content="questions">
+            <h3>${t.tabs.questions}</h3>
+            <ul class="text-list">${text.questions.map((item) => `<li>${item}</li>`).join("")}</ul>
+          </div>
+          <div class="tab-content ${activeTabId === "hierarchy" ? "active" : ""}" data-content="hierarchy">
+            <h3>${t.componentsTitle}</h3>
+            <p class="hierarchy-helper">${t.componentsHelper}</p>
+            <div class="hierarchy-card-grid">
+              ${stage.hierarchy.map((item, index) => `
+                <button type="button" class="hierarchy-card-button hierarchy-chip ${(selectedItemByStage[stage.id] || stage.hierarchy[0]) === item ? "active" : ""}" data-item="${item}">
+                  <span class="hierarchy-card-icon">${getHierarchyDetail(item).icon}</span>
+                  <span>
+                    <span class="hierarchy-card-name">${getHierarchyDetail(item).title}</span>
+                    <span class="hierarchy-card-subtitle">${getHierarchyDetail(item).subtitle}</span>
+                  </span>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDetail(stage) {
+      const t = uiText();
+      const text = getStageText(stage);
+      activeStageId = stage.id;
+      const selectedItem = selectedItemByStage[stage.id] || stage.hierarchy[0];
+      selectedItemByStage[stage.id] = selectedItem;
+      detailPanel.style.setProperty("--panel-accent", stage.accent);
+      detailPanel.innerHTML = `
+        <div class="detail-header">
+          <div>
+            <p class="detail-kicker">${t.stageLabel} ${stage.number}</p>
+            <h2>${stage.icon} ${stage.title}</h2>
+            <p>${text.subtitle}</p>
+          </div>
+          <button class="close-button" type="button" aria-label="${t.closeDetail}" id="closeDetail">×</button>
+        </div>
+        <div class="detail-body">
+          <div>${getTabHtml(stage)}</div>
+          <aside class="hierarchy-box">
+            <h3>${t.detailTitle}</h3>
+            <div class="hierarchy-output" id="hierarchyOutput">
+              ${renderHierarchyDetail(selectedItem)}
+            </div>
+          </aside>
+        </div>
+      `;
+
+      detailWrap.classList.add("open");
+      supportWrap.classList.remove("open");
+      summaryWrap.classList.remove("open");
+      pmWrap.classList.remove("open");
+      updateToggleButtons();
+      updateActiveCards(stage.id);
+      bindDetailPanelEvents();
+    }
+
+    function updateActiveCards(stageId) {
+      document.querySelectorAll(".summary-card").forEach((card) => {
+        const isActive = card.dataset.stage === stageId && detailWrap.classList.contains("open");
+        card.classList.toggle("active", isActive);
+        card.setAttribute("aria-expanded", String(isActive));
+      });
+    }
+
+    function closeDetail() {
+      detailWrap.classList.remove("open");
+      activeStageId = null;
+      updateActiveCards("");
+    }
+
+    function bindDetailPanelEvents() {
+      document.getElementById("closeDetail").addEventListener("click", closeDetail);
+
+      function setSelectedDetail(chip, selector) {
+        const item = chip.dataset.item;
+        if (activeStageId) {
+          selectedItemByStage[activeStageId] = item;
+        }
+        detailPanel.querySelectorAll(selector).forEach((entry) => entry.classList.remove("active"));
+        chip.classList.add("active");
+        const output = document.getElementById("hierarchyOutput");
+        output.style.opacity = "0";
+        window.setTimeout(() => {
+          output.innerHTML = renderHierarchyDetail(item);
+          output.style.opacity = "1";
+        }, 120);
+      }
+
+      detailPanel.querySelectorAll(".detail-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const target = tab.dataset.tab;
+          activeTabId = target;
+          detailPanel.querySelectorAll(".detail-tab").forEach((item) => item.classList.toggle("active", item === tab));
+          detailPanel.querySelectorAll(".tab-content").forEach((content) => {
+            content.classList.toggle("active", content.dataset.content === target);
+          });
+          if (target === "hierarchy") {
+            const firstChip = detailPanel.querySelector(".hierarchy-chip");
+            if (firstChip) {
+              setSelectedDetail(firstChip, ".hierarchy-chip");
+            }
+          }
+        });
+      });
+
+      detailPanel.querySelectorAll(".hierarchy-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          setSelectedDetail(chip, ".hierarchy-chip");
+        });
+      });
+
+    }
+
+    function renderSupportPanel() {
+      supportPanel.innerHTML = `
+        <div class="detail-header">
+          <div>
+            <p class="detail-kicker">Supporting Layers</p>
+            <h2>전체 서비스에 걸친 운영·보안·배포·모니터링</h2>
+            <p>아래 항목을 클릭하면 짧은 설명이 표시됩니다.</p>
+          </div>
+          <button class="close-button" type="button" aria-label="Close supporting layers" id="closeSupport">×</button>
+        </div>
+        <div class="support-grid">
+          ${Object.entries(supportGroups).map(([group, items]) => `
+            <div class="support-card">
+              <h3>${group}</h3>
+              <div class="chip-row">
+                ${items.map((item) => `<button type="button" class="chip support-chip" data-item="${item}">${item}</button>`).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="support-output" id="supportOutput">Supporting Layers의 항목을 클릭하면 설명과 관련 예시가 여기에 표시됩니다.</div>
+      `;
+
+      document.getElementById("closeSupport").addEventListener("click", () => supportWrap.classList.remove("open"));
+      supportPanel.querySelectorAll(".support-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          supportPanel.querySelectorAll(".support-chip").forEach((item) => item.classList.remove("active"));
+          chip.classList.add("active");
+          const item = chip.dataset.item;
+          document.getElementById("supportOutput").innerHTML = renderHierarchyDetail(item);
+        });
+      });
+    }
+
+    function toggleSupport() {
+      const shouldOpen = !supportWrap.classList.contains("open");
+      supportWrap.classList.toggle("open", shouldOpen);
+      if (shouldOpen) {
+        closeDetail();
+        summaryWrap.classList.remove("open");
+        pmWrap.classList.remove("open");
+        renderSupportPanel();
+      }
+      updateToggleButtons();
+    }
+
+    function toggleSummary() {
+      const shouldOpen = !summaryWrap.classList.contains("open");
+      summaryWrap.classList.toggle("open", shouldOpen);
+      if (shouldOpen) {
+        closeDetail();
+        supportWrap.classList.remove("open");
+        pmWrap.classList.remove("open");
+      }
+      updateToggleButtons();
+    }
+
+    function togglePmView() {
+      const shouldOpen = !pmWrap.classList.contains("open");
+      pmWrap.classList.toggle("open", shouldOpen);
+      if (shouldOpen) {
+        closeDetail();
+        supportWrap.classList.remove("open");
+        summaryWrap.classList.remove("open");
+      }
+      updateToggleButtons();
+    }
+
+    function updateToggleButtons() {
+      document.getElementById("summaryToggle").classList.toggle("active", summaryWrap.classList.contains("open"));
+      document.getElementById("pmToggle").classList.toggle("active", pmWrap.classList.contains("open"));
+    }
+
+    function setLanguage(language) {
+      if (currentLanguage === language) return;
+      currentLanguage = language;
+      renderStaticText();
+      renderFlow();
+      renderSummaryCards();
+      updateActiveCards(activeStageId || "");
+      if (detailWrap.classList.contains("open") && activeStageId) {
+        const activeStage = stages.find((stage) => stage.id === activeStageId);
+        if (activeStage) {
+          renderDetail(activeStage);
+        }
+      } else {
+        updateActiveCards(activeStageId || "");
+      }
+      updateToggleButtons();
+    }
+
+    function expandAllPreviews() {
+      const firstStage = stages[0];
+      renderDetail(firstStage);
+    }
+
+    function collapseAll() {
+      closeDetail();
+      supportWrap.classList.remove("open");
+      summaryWrap.classList.remove("open");
+      pmWrap.classList.remove("open");
+      document.querySelectorAll(".summary-card").forEach((card) => {
+        card.classList.remove("active");
+        card.setAttribute("aria-expanded", "false");
+      });
+      updateToggleButtons();
+    }
+
+    function bindMainEvents() {
+      document.getElementById("langEn").addEventListener("click", () => setLanguage("en"));
+      document.getElementById("langKo").addEventListener("click", () => setLanguage("ko"));
+
+      summaryGrid.addEventListener("click", (event) => {
+        const card = event.target.closest(".summary-card");
+        if (!card) return;
+        const stage = stages.find((item) => item.id === card.dataset.stage);
+        if (activeStageId === stage.id && detailWrap.classList.contains("open")) {
+          closeDetail();
+          return;
+        }
+        renderDetail(stage);
+        detailPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+
+      document.getElementById("expandAll").addEventListener("click", expandAllPreviews);
+      document.getElementById("collapseAll").addEventListener("click", collapseAll);
+      document.getElementById("summaryToggle").addEventListener("click", toggleSummary);
+      document.getElementById("pmToggle").addEventListener("click", togglePmView);
+    }
+
+    renderStaticText();
+    renderFlow();
+    renderSummaryCards();
+    bindMainEvents();
+  </script>
+</body>
+</html>
